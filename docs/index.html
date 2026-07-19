@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="OutcomeRail is a read-only, deterministic execution-quality receipt pipeline for Polymarket orderbooks.">
+  <title>OutcomeRail — Read-only execution quality</title>
+  <style>
+    :root { color-scheme: dark; --bg: #020617; --panel: #0f172a; --line: #1e293b; --text: #e2e8f0; --muted: #94a3b8; --cyan: #22d3ee; --green: #34d399; --purple: #a78bfa; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 20% 0%, #143253 0, var(--bg) 38rem); color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    main { width: min(1040px, calc(100% - 2rem)); margin: 0 auto; padding: 4.5rem 0 3rem; }
+    .eyebrow { color: var(--cyan); font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { max-width: 900px; margin: .65rem 0 1rem; font-size: clamp(2rem, 5vw, 4.4rem); line-height: 1.04; letter-spacing: -.05em; }
+    .lead { max-width: 760px; color: var(--muted); font-size: clamp(1rem, 2vw, 1.2rem); line-height: 1.7; }
+    .cta { display: flex; flex-wrap: wrap; gap: .75rem; margin: 2rem 0 3.5rem; }
+    a.button { border: 1px solid var(--cyan); border-radius: .55rem; padding: .75rem 1rem; color: #03111a; background: var(--cyan); font-weight: 800; text-decoration: none; }
+    a.button.secondary { border-color: var(--line); color: var(--text); background: rgba(15, 23, 42, .72); }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+    .card { min-height: 220px; padding: 1.35rem; border: 1px solid var(--line); border-radius: .8rem; background: rgba(15, 23, 42, .78); }
+    .card:nth-child(2) h2 { color: var(--green); } .card:nth-child(3) h2 { color: var(--purple); }
+    h2 { margin: 0 0 1rem; color: var(--cyan); font-size: 1rem; }
+    p, li { color: var(--muted); line-height: 1.6; font-size: .88rem; }
+    ul { padding-left: 1.05rem; }
+    .boundary { margin-top: 1rem; padding: 1.25rem; border-left: 3px solid #fb7185; background: rgba(251, 113, 133, .06); color: var(--muted); line-height: 1.65; }
+    code { color: #bae6fd; font-size: .86em; }
+    footer { margin-top: 3rem; color: #64748b; font-size: .78rem; }
+    @media (max-width: 760px) { main { padding-top: 2.5rem; } .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">Prototype / Hackathon V1</div>
+    <h1>Pre-trade execution quality, without trading.</h1>
+    <p class="lead">OutcomeRail evaluates public Polymarket orderbook liquidity for a requested outcome and size, then returns a deterministic, independently verifiable receipt.</p>
+    <div class="cta">
+      <a class="button" href="outcomerail-architecture.html">View architecture</a>
+      <a class="button secondary" href="https://github.com/Scarpo-gh/outcome-rail">View source on GitHub</a>
+    </div>
+    <section class="grid" aria-label="OutcomeRail capabilities">
+      <article class="card"><h2>Public data only</h2><p>Resolves a public Gamma market and reads its public CLOB orderbook snapshot. No account, credential, private feed, or trading endpoint is used.</p></article>
+      <article class="card"><h2>Conservative verdict</h2><p>Requested-size VWAP and visible depth produce <code>PROCEED</code>, <code>REDUCE</code>, or <code>BLOCK</code>. Freshness, spread, and price-gap policy can only tighten the result.</p></article>
+      <article class="card"><h2>Verifiable receipt</h2><p>A canonical input manifest, policy hash, source snapshot metadata, analysis result, and receipt hash are bound into one tamper-evident artifact.</p></article>
+    </section>
+    <div class="boundary"><strong>Safety boundary:</strong> OutcomeRail V1 does not send orders, custody funds, connect wallets, settle payments, or make profitability claims.</div>
+    <footer>OutcomeRail · read-only execution-quality infrastructure · <a href="outcomerail-architecture.svg">SVG architecture fallback</a></footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,28 @@
+# Python bytecode and test artefacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local environments and editor state
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+
+# Runtime evidence and local credentials are never published or committed.
+evidence/
+secrets/
+*.pem
+*.key
+recovery.json
+recovery-file.json
+credential.json
+credentials.json
+
+# Hermes local planning/session artefacts
+.hermes/HANDOFF.md

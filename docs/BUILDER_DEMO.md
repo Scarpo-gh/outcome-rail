@@ -40,6 +40,8 @@ Canonical manifest ─► execution receipt ─► local evidence entry
                               independent verification
 ```
 
+Public demo: [https://scarpo-gh.github.io/outcome-rail/](https://scarpo-gh.github.io/outcome-rail/)
+
 Ayrıntılı görsel: [`outcomerail-architecture.html`](outcomerail-architecture.html). Dosya-URL'si tarayıcı/panel tarafından engellenirse, doğrudan görüntülenebilir SVG sürümü: [`outcomerail-architecture.svg`](outcomerail-architecture.svg).
 
 ## 2 dakikalık canlı demo

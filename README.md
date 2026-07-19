@@ -60,6 +60,8 @@ Kaynak botlardan alınabilecek/ayrıştırılan yetenekler: [`docs/SOURCE_ADAPTA
 
 Arc builder görünürlüğü için kısa ürün hikâyesi, canlı demo komutu, doğrulama adımları ve mimari: [`docs/BUILDER_DEMO.md`](docs/BUILDER_DEMO.md).
 
+Public demo: [scarpo-gh.github.io/outcome-rail](https://scarpo-gh.github.io/outcome-rail/)
+
 ## Çalıştırma
 
 ```bash

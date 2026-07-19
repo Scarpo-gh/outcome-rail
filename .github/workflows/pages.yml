@@ -1,5 +1,6 @@
 name: Deploy GitHub Pages
 
+# Publishes only reviewed static artifacts from docs/.
 on:
   push:
     branches: [main]

@@ -21,7 +21,7 @@ Given a public Polymarket `market_id`, outcome, side and requested size, it:
 
 The current V1 is intentionally narrow: no trade placement, custody, wallet connection, private credentials, or settlement. A live public-data smoke run produces a verified receipt and an append-only local evidence entry.
 
-Architecture / demo package: `<PUBLIC_REPO_OR_DEMO_URL>`
+Architecture / demo package: https://scarpo-gh.github.io/outcome-rail/
 
 I’d appreciate feedback on one specific next step: **what is the simplest Arc-native model for a bounded agent analysis job?**
 

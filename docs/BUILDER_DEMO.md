@@ -44,6 +44,10 @@ Public demo: [https://scarpo-gh.github.io/outcome-rail/](https://scarpo-gh.githu
 
 Ayrıntılı görsel: [`outcomerail-architecture.html`](outcomerail-architecture.html). Dosya-URL'si tarayıcı/panel tarafından engellenirse, doğrudan görüntülenebilir SVG sürümü: [`outcomerail-architecture.svg`](outcomerail-architecture.svg).
 
+## Read-only local API
+
+CLI dışında agent/tool entegrasyonu için local WSGI endpoint: `POST /v1/analyze`. Contract, `curl` örneği ve hata yüzeyi: [`API.md`](API.md). API yalnız `127.0.0.1` üzerinde başlar; GitHub Pages static demodur ve API host etmez.
+
 ## 2 dakikalık canlı demo
 
 Bu komut yalnız public HTTP okuması yapar. Emir, auth, wallet veya transfer içermez.

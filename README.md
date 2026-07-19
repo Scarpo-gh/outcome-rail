@@ -72,6 +72,16 @@ python -m pip install --upgrade pip pytest
 pytest -q
 ```
 
+## Read-only local API
+
+`POST /v1/analyze`, public market snapshot'ını receipt/manifest ile birlikte döndürür; trade veya evidence log yazımı yapmaz. Local kullanım, `curl` örneği, hata sözleşmesi ve güvenlik sınırları: [`docs/API.md`](docs/API.md).
+
+```bash
+python3 scripts/serve_api.py
+```
+
+Varsayılan adres yalnız loopback'tir: `http://127.0.0.1:8080`.
+
 ## Güvenlik sınırları
 
 - Polymarket trading credential’ı istenmez veya saklanmaz.

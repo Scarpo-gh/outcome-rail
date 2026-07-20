@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="OutcomeRail is a read-only, deterministic execution-quality receipt pipeline for Polymarket orderbooks.">
-  <title>OutcomeRail — Read-only execution quality</title>
+  <meta name="description" content="OutcomeRail is a read-only, deterministic provenance and execution-feasibility receipt pipeline for public prediction-market data.">
+  <title>OutcomeRail — Read-only market-data receipts</title>
   <style>
     :root { color-scheme: dark; --bg: #020617; --panel: #0f172a; --line: #1e293b; --text: #e2e8f0; --muted: #94a3b8; --cyan: #22d3ee; --green: #34d399; --purple: #a78bfa; }
     * { box-sizing: border-box; }
@@ -31,8 +31,8 @@
 <body>
   <main>
     <div class="eyebrow">Prototype / Hackathon V1</div>
-    <h1>Pre-trade execution quality, without trading.</h1>
-    <p class="lead">OutcomeRail evaluates public Polymarket orderbook liquidity for a requested outcome and size, then returns a deterministic, independently verifiable receipt.</p>
+    <h1>Prediction-market data receipts, without trading.</h1>
+    <p class="lead">OutcomeRail reads public market-data snapshots through a read-only adapter, evaluates visible liquidity for a requested outcome and size, and returns a deterministic, tamper-evident receipt. It is developer infrastructure—not a trading, wagering, or investment product.</p>
     <div class="cta">
       <a class="button" href="outcomerail-architecture.html">View architecture</a>
       <a class="button secondary" href="https://github.com/Scarpo-gh/outcome-rail/blob/main/docs/API.md">Read local API contract</a>
@@ -43,8 +43,8 @@
       <article class="card"><h2>Conservative verdict</h2><p>Requested-size VWAP and visible depth produce <code>PROCEED</code>, <code>REDUCE</code>, or <code>BLOCK</code>. Freshness, spread, and price-gap policy can only tighten the result.</p></article>
       <article class="card"><h2>Verifiable receipt</h2><p>A canonical input manifest, policy hash, source snapshot metadata, analysis result, and receipt hash are bound into one tamper-evident artifact.</p></article>
     </section>
-    <div class="boundary"><strong>Safety boundary:</strong> OutcomeRail V1 does not send orders, custody funds, connect wallets, settle payments, or make profitability claims.</div>
-    <footer>OutcomeRail · read-only execution-quality infrastructure · <a href="outcomerail-architecture.svg">SVG architecture fallback</a></footer>
+    <div class="boundary"><strong>Safety boundary:</strong> OutcomeRail V1 does not send orders, connect wallets, custody funds, settle real payments, offer wagering access, bypass venue restrictions, or make profitability/investment claims.</div>
+    <footer>OutcomeRail · read-only prediction-market data infrastructure · <a href="outcomerail-architecture.svg">SVG architecture fallback</a></footer>
   </main>
 </body>
 </html>

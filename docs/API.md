@@ -1,6 +1,6 @@
 # OutcomeRail Read-only Analysis API — V1
 
-`POST /v1/analyze`, bir Polymarket market/outcome isteğini yalnız public Gamma ve CLOB verisiyle değerlendirir. Trade, wallet, custody, transfer, settlement, credential veya Arc on-chain işlemi başlatmaz.
+`POST /v1/analyze`, ilk public-data adapter olarak bir Polymarket market/outcome snapshot'ını yalnız public Gamma ve CLOB verisiyle execution feasibility açısından değerlendirir. Bu endpoint trade, wallet, custody, transfer, wagering, yatırım tavsiyesi, credential veya Arc on-chain işlemi başlatmaz.
 
 > Bu WSGI servis GitHub Pages üzerinde çalışmaz. Pages yalnız static demo/dokümantasyonu sunar; API local loopback için tasarlanmıştır.
 

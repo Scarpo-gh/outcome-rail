@@ -2,9 +2,9 @@
 
 ## Tek cümle
 
-**OutcomeRail**, bir Polymarket analiz isteğini public orderbook verisiyle değerlendiren, deterministic bir execution-quality receipt üreten ve input provenance'ını doğrulanabilir manifest'e bağlayan read-only agent altyapısıdır.
+**OutcomeRail**, ilk public-data adapter olarak Polymarket orderbook snapshot'ını değerlendiren, deterministic bir execution-feasibility/provenance receipt üreten read-only agent altyapısıdır.
 
-> Trade yapmaz, custody almaz, cüzdan veya Polymarket credential istemez; kârlılık/sonuç garantisi vermez.
+> Trade, wagering, custody, wallet veya Polymarket credential istemez; kârlılık, outcome tahmini veya yatırım sonucu garantisi vermez.
 
 ## Neyi çözüyor?
 

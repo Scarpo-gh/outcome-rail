@@ -8,11 +8,16 @@ htmlcov/
 # Local environments and editor state
 .venv/
 venv/
+node_modules/
 .env
 .env.*
 !.env.example
 .vscode/
 .idea/
+
+# Foundry build artefacts
+out/
+cache/
 
 # Runtime evidence and local credentials are never published or committed.
 evidence/

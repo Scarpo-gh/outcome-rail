@@ -61,7 +61,8 @@ class FakeTransactionsApi:
 
     def get_transaction(self, *, id):
         self.polls += 1
-        return SimpleNamespace(data=SimpleNamespace(transaction=SimpleNamespace(state="COMPLETE", tx_hash="0xabc")))
+        state = SimpleNamespace(value="COMPLETE")
+        return SimpleNamespace(data=SimpleNamespace(transaction=SimpleNamespace(state=state, tx_hash="0xabc")))
 
 
 def _plan():

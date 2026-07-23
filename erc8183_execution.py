@@ -144,7 +144,8 @@ def _transaction_view(response: Any) -> Any:
 def _poll_transaction(transactions_api: Any, transaction_id: str, *, poll_interval_seconds: float, max_polls: int, sleep: Callable[[float], None]) -> dict[str, str | None]:
     for _ in range(max_polls):
         transaction = _transaction_view(transactions_api.get_transaction(id=transaction_id))
-        state = str(transaction.state)
+        raw_state = getattr(transaction, "state", None)
+        state = str(getattr(raw_state, "value", raw_state)).rsplit(".", 1)[-1]
         if state == "COMPLETE":
             return {"transaction_id": transaction_id, "state": state, "tx_hash": getattr(transaction, "tx_hash", None)}
         if state in {"FAILED", "CANCELLED", "DENIED"}:

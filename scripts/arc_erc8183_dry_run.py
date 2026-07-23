@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Safe, receipt-bound ERC-8183 Arc Testnet preflight.
 
-This module only creates deterministic call *plans*. It deliberately imports no
-Circle SDK and has no HTTP/RPC/transaction-broadcast code. Future execution is
-not implemented and is gated by an explicit confirmation token.
+By default this module only creates deterministic call *plans*. It imports no
+Circle SDK and makes no HTTP/RPC calls unless an individual lifecycle step is
+invoked with both --execute and the literal confirmation token.
 """
 from __future__ import annotations
 
@@ -33,10 +33,6 @@ EXECUTION_CONFIRMATION_TOKEN = "ERC8183_EXECUTION_CONFIRMED"
 
 class ReceiptPreflightError(ValueError):
     """Receipt JSON is not a verified canonical OutcomeRail receipt."""
-
-
-class ExecutionUnavailableError(RuntimeError):
-    """Raised for all execution requests: this module never broadcasts."""
 
 
 def hash32(text: str) -> str:
@@ -166,20 +162,46 @@ def build_erc8183_preflight(*, receipt_json: str, state: dict[str, Any], deadlin
     }
 
 
-def request_execution(plan: dict[str, Any], *, confirmation_token: str | None) -> None:
-    """Fail closed: even confirmed execution cannot broadcast from this module."""
-    if confirmation_token != EXECUTION_CONFIRMATION_TOKEN:
-        raise ExecutionUnavailableError("execution requires the deliberate confirmation token")
-    raise ExecutionUnavailableError("execution is not implemented; no transaction was broadcast")
+def request_execution(
+    plan: dict[str, Any],
+    *,
+    step_name: str,
+    job_a_id: int,
+    job_b_id: int,
+    execute: bool,
+    confirmation_token: str | None,
+    env_file: Path | None = None,
+) -> dict[str, str | None]:
+    """Execute exactly one lifecycle call; the adapter performs the fail-closed guard."""
+    from erc8183_execution import build_execution_steps, execute_step, make_circle_client_factory
+
+    steps = {step.name: step for step in build_execution_steps(plan, job_a_id=job_a_id, job_b_id=job_b_id)}
+    try:
+        step = steps[step_name]
+    except KeyError as error:
+        raise ValueError(f"unknown ERC-8183 execution step: {step_name}") from error
+    return execute_step(
+        step,
+        execute=execute,
+        confirmation_token=confirmation_token,
+        client_factory=make_circle_client_factory(env_file),
+    )
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Receipt-verified ERC-8183 dry-run; never broadcasts.")
+    parser = argparse.ArgumentParser(description="Receipt-verified ERC-8183 dry-run by default; executes only one explicitly confirmed step.")
     parser.add_argument("--state", type=Path, required=True, help="Public Arc wallet state JSON")
     parser.add_argument("--receipt", type=Path, required=True, help="Canonical OutcomeRail receipt JSON")
     parser.add_argument("--deadline-minutes", type=int, default=15)
-    parser.add_argument("--execute", action="store_true", help="Reserved; execution remains unavailable")
-    parser.add_argument("--confirm", help="Required deliberate token for a future execution mode")
+    parser.add_argument("--execute", action="store_true", help="Send exactly one selected lifecycle call; requires --confirm")
+    parser.add_argument("--confirm", help="Must literally be ERC8183_EXECUTION_CONFIRMED with --execute")
+    parser.add_argument("--step", choices=(
+        "create_job_a", "set_budget_a", "approve_a", "fund_a", "submit_a", "complete_a",
+        "create_job_b", "set_budget_b", "approve_b", "fund_b", "claim_refund_b",
+    ), help="One mutating ERC-8183 call to execute")
+    parser.add_argument("--job-a-id", type=int, default=0, help="Public Job A ID for its post-create steps")
+    parser.add_argument("--job-b-id", type=int, default=0, help="Public Job B ID for its post-create steps")
+    parser.add_argument("--env-file", type=Path, help="Optional local Circle .env; read only after both execution guards pass")
     args = parser.parse_args()
     if args.deadline_minutes < 10:
         raise SystemExit("Deadline en az 10 dakika olmalı; refund testi için güvenli buffer gerekir.")
@@ -192,7 +214,18 @@ def main() -> None:
     )
     print(json.dumps(plan, indent=2, sort_keys=True))
     if args.execute:
-        request_execution(plan, confirmation_token=args.confirm)
+        if not args.step:
+            raise SystemExit("--execute requires exactly one --step")
+        result = request_execution(
+            plan,
+            step_name=args.step,
+            job_a_id=args.job_a_id,
+            job_b_id=args.job_b_id,
+            execute=args.execute,
+            confirmation_token=args.confirm,
+            env_file=args.env_file,
+        )
+        print(json.dumps({"execution_result": result}, sort_keys=True))
 
 
 if __name__ == "__main__":

@@ -10,13 +10,11 @@ from outcomerail_engine import analyze_execution
 from policy import ExecutionPolicy
 from polymarket_client import normalize_book
 from receipt import build_execution_receipt
+from erc8183_execution import ExecutionGuardError, require_execution_authorization
 from scripts.arc_erc8183_dry_run import (
-    EXECUTION_CONFIRMATION_TOKEN,
-    ExecutionUnavailableError,
     ReceiptPreflightError,
     build_erc8183_preflight,
     derive_receipt_bytes32,
-    request_execution,
 )
 
 
@@ -107,16 +105,16 @@ def test_preflight_rejects_tampered_or_duplicate_key_receipt_before_hash_binding
         )
 
 
-def test_execution_request_is_never_broadcast_by_default_and_requires_confirmation_token():
+def test_preflight_is_dry_run_and_execution_authorization_requires_both_inputs():
     plan = build_erc8183_preflight(
         receipt_json=_canonical_receipt_json(), state=_state(), deadline=1_800_000_000
     )
 
     assert plan["safety"]["broadcast_performed"] is False
-    with pytest.raises(ExecutionUnavailableError, match="confirmation token"):
-        request_execution(plan, confirmation_token=None)
-    with pytest.raises(ExecutionUnavailableError, match="not implemented"):
-        request_execution(plan, confirmation_token=EXECUTION_CONFIRMATION_TOKEN)
+    with pytest.raises(ExecutionGuardError, match="--execute"):
+        require_execution_authorization(execute=False, confirmation_token="ERC8183_EXECUTION_CONFIRMED")
+    with pytest.raises(ExecutionGuardError, match="confirmation"):
+        require_execution_authorization(execute=True, confirmation_token=None)
 
 
 def test_preflight_script_runs_directly_from_repo_root():
@@ -130,4 +128,4 @@ def test_preflight_script_runs_directly_from_repo_root():
     )
 
     assert result.returncode == 0
-    assert "Receipt-verified ERC-8183 dry-run" in result.stdout
+    assert "Receipt-verified ERC-8183 dry-run by default" in result.stdout

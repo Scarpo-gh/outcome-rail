@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OutcomeRail — Checkpoint 2</title>
+  <meta name="description" content="OutcomeRail Checkpoint 2 presentation: verifiable, read-only public-data analysis receipts for agents.">
+  <style>
+    :root { --ink:#071622; --ink2:#0f2636; --paper:#f5f7f4; --mist:#dce8e8; --cyan:#24d8cb; --mint:#8bf0c7; --muted:#9eb3bd; --orange:#ffb66f; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#071622; color:var(--paper); font:18px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .slide { display:none; min-height:100vh; padding:7vh 9vw 8vh; position:relative; overflow:hidden; background:linear-gradient(135deg, var(--ink) 0%, #0c2c39 100%); }
+    .slide.active { display:flex; flex-direction:column; justify-content:center; }
+    .slide.light { background:var(--paper); color:var(--ink); }
+    .slide:before { content:""; position:absolute; width:50vw; height:50vw; border-radius:50%; background:radial-gradient(circle, rgba(36,216,203,.18), transparent 68%); right:-20vw; top:-27vw; pointer-events:none; }
+    .eyebrow { color:var(--cyan); text-transform:uppercase; letter-spacing:.16em; font-size:.73rem; font-weight:800; margin:0 0 1.1rem; }
+    h1,h2,h3,p { margin-top:0; } h1 { font-size:clamp(3rem,8vw,7.5rem); line-height:.93; letter-spacing:-.07em; max-width:950px; margin-bottom:1.7rem; } h2 { font-size:clamp(2.25rem,5vw,4.9rem); line-height:1; letter-spacing:-.055em; max-width:980px; margin-bottom:1.5rem; } h3 { font-size:1rem; letter-spacing:.04em; text-transform:uppercase; margin-bottom:.5rem; }
+    .lead { max-width:780px; font-size:clamp(1.2rem,2.3vw,1.8rem); color:#c9d9dd; } .light .lead { color:#45616b; }
+    .tag { display:inline-flex; border:1px solid rgba(139,240,199,.55); color:var(--mint); border-radius:999px; padding:.3rem .7rem; font-size:.76rem; font-weight:750; letter-spacing:.04em; margin-bottom:1rem; width:max-content; }
+    .number { position:absolute; right:6vw; bottom:5vh; font-size:.8rem; color:var(--muted); font-weight:750; }
+    .foot { position:absolute; left:9vw; bottom:5vh; font-size:.78rem; color:var(--muted); max-width:75vw; }
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.1rem; max-width:1100px; } .card { padding:1.35rem; border-radius:18px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); } .light .card { background:#e7eeee; border-color:#d4dfdf; }
+    .card strong { display:block; font-size:1.15rem; margin-bottom:.35rem; } .card p { color:#bcd0d4; margin-bottom:0; font-size:.94rem; } .light .card p { color:#45616b; }
+    .flow { display:flex; align-items:stretch; gap:.75rem; max-width:1120px; } .node { flex:1; padding:1rem; border-radius:14px; background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.14); font-weight:750; } .arrow { color:var(--cyan); align-self:center; font-size:2rem; }
+    .receipt { max-width:780px; padding:1.2rem 1.45rem; border-radius:18px; background:#e8f0ed; color:var(--ink); box-shadow:18px 20px 0 rgba(36,216,203,.3); } .receipt code { display:block; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.85rem; overflow-wrap:anywhere; color:#285565; }
+    .split { display:grid; grid-template-columns:1fr 1.1fr; gap:4vw; align-items:center; max-width:1200px; } .timeline { border-left:2px solid var(--cyan); padding-left:1.5rem; } .timeline div { margin:.55rem 0 1.05rem; } .timeline b { display:block; color:var(--cyan); }
+    .path { display:grid; grid-template-columns:1fr 1fr; gap:1rem; max-width:1030px; } .path .card { min-height:190px; } .testnet { color:#2a7769; font-weight:800; } .light .tag { color:#167562; border-color:#77c6b4; }
+    .scope { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:.65rem 2rem; max-width:950px; } .scope p { margin:0; font-size:1.06rem; } .yes { color:#175e53; } .no { color:#9b452c; }
+    nav { position:fixed; right:2vw; top:50%; transform:translateY(-50%); z-index:3; display:flex; flex-direction:column; gap:.5rem; } nav button { width:12px; height:12px; border-radius:50%; border:1px solid rgba(255,255,255,.65); background:transparent; cursor:pointer; } nav button.on { background:var(--cyan); border-color:var(--cyan); } .controls { position:fixed; z-index:3; right:3vw; bottom:3vh; display:flex; gap:.5rem; } .controls button { border:1px solid rgba(255,255,255,.35); background:rgba(7,22,34,.7); color:white; border-radius:9px; padding:.45rem .75rem; cursor:pointer; }
+    a { color:inherit; } .link { color:var(--cyan); font-weight:800; } @media (max-width:800px) { .slide { padding:11vh 7vw 12vh; } .grid,.split,.path { grid-template-columns:1fr; } .flow { flex-direction:column; } .arrow { transform:rotate(90deg); align-self:flex-start; } .scope { grid-template-columns:1fr; } .foot { left:7vw; } }
+  </style>
+</head>
+<body>
+  <nav aria-label="Slides"><button class="on" aria-label="Slide 1"></button><button aria-label="Slide 2"></button><button aria-label="Slide 3"></button><button aria-label="Slide 4"></button><button aria-label="Slide 5"></button></nav>
+  <section class="slide active">
+    <p class="eyebrow">Encode × Arc · Mid-submission checkpoint</p>
+    <div class="tag">Agentic Economy Track</div>
+    <h1>Public-data analysis<br><span style="color:var(--cyan)">agents can prove.</span></h1>
+    <p class="lead">OutcomeRail turns a read-only market snapshot into a deterministic, verifiable analysis receipt — then demonstrates agent-job delivery and timeout handling on Arc Testnet.</p>
+    <p class="foot">OutcomeRail · Polymarket is the first public-data adapter · July 2026</p><span class="number">01 / 05</span>
+  </section>
+  <section class="slide light">
+    <p class="eyebrow">The problem</p><h2>Agents need more than an opaque API response.</h2>
+    <div class="grid"><div class="card"><strong>What data?</strong><p>Public snapshots change. A later reviewer needs to know the exact source, timestamp and snapshot hash.</p></div><div class="card"><strong>What rules ran?</strong><p>Visible-depth and freshness checks must be explicit, deterministic and versioned.</p></div><div class="card"><strong>What was delivered?</strong><p>An agent-to-agent result needs a bounded deliverable, not an unverifiable claim.</p></div></div>
+    <p class="foot">OutcomeRail addresses analysis provenance; it does not place or recommend trades.</p><span class="number">02 / 05</span>
+  </section>
+  <section class="slide">
+    <p class="eyebrow">What OutcomeRail does</p><h2>Snapshot → rules → receipt.</h2>
+    <div class="flow"><div class="node">Public Gamma / CLOB snapshot</div><div class="arrow">→</div><div class="node">Deterministic coverage &amp; liquidity-quality checks</div><div class="arrow">→</div><div class="node">Canonical manifest + SHA-256 receipt</div></div>
+    <div class="receipt" style="margin-top:2rem"><strong>Receipt binds:</strong><code>input · source / snapshot hashes · policy version · analysis result · evidence hash</code><p style="margin:1rem 0 0">If a bound field changes, receipt verification fails.</p></div>
+    <p class="foot">First adapter: Polymarket public Gamma/CLOB data. No credentials, wallet connection or order placement.</p><span class="number">03 / 05</span>
+  </section>
+  <section class="slide light">
+    <p class="eyebrow">Arc Testnet proof</p><h2>Two bounded ERC-8183 paths.</h2>
+    <div class="path"><div class="card"><span class="testnet">JOB A · 5 test-USDC</span><h3>Receipt delivered</h3><p>create → budget → fund → submit verified receipt hash → complete</p><p><a class="link" href="https://testnet.arcscan.app/tx/0x5968dfe24910eb734fcaaa96cfa7afc9152fbb3611b271f211f1d801312a5ea7">View completion on Arcscan ↗</a></p></div><div class="card"><span class="testnet">JOB B · 5 test-USDC</span><h3>Timeout protected</h3><p>create → budget → fund → expiry → claimRefund</p><p><a class="link" href="https://testnet.arcscan.app/tx/0x94865921d18d15f0c9c3391c0cd7eaa17b887651fc74b0af4bf6ec0e5f565f4e">View refund on Arcscan ↗</a></p></div></div>
+    <p class="foot">Arc Testnet reference contract · two-wallet demonstration · testnet-only</p><span class="number">04 / 05</span>
+  </section>
+  <section class="slide">
+    <p class="eyebrow">Scope & next step</p><h2>Make agent outputs easier to check and safer to deliver.</h2>
+    <div class="scope"><p class="yes">✓ Read-only public-data analysis</p><p class="no">× No trading or recommendations</p><p class="yes">✓ Deterministic, verifiable receipts</p><p class="no">× No custody or user wallets</p><p class="yes">✓ Testnet job lifecycle evidence</p><p class="no">× No mainnet or real USDC</p></div>
+    <div class="timeline" style="margin-top:2rem"><div><b>Built now</b>Public snapshot receipt generation, verification, and Arc Testnet complete/refund evidence.</div><div><b>Next</b>Standardized agent deliverable schema and signed callback / external checkpointing.</div></div>
+    <p class="foot"><a class="link" href="https://github.com/Scarpo-gh/outcome-rail">github.com/Scarpo-gh/outcome-rail ↗</a> · <a class="link" href="https://scarpo-gh.github.io/outcome-rail/">Public demo ↗</a></p><span class="number">05 / 05</span>
+  </section>
+  <div class="controls"><button id="prev" aria-label="Previous slide">←</button><button id="next" aria-label="Next slide">→</button></div>
+  <script>
+    const slides=[...document.querySelectorAll('.slide')], dots=[...document.querySelectorAll('nav button')]; let index=0;
+    function show(n){index=(n+slides.length)%slides.length; slides.forEach((s,i)=>s.classList.toggle('active',i===index)); dots.forEach((d,i)=>d.classList.toggle('on',i===index)); history.replaceState(null,'',`#${index+1}`);}
+    document.getElementById('next').onclick=()=>show(index+1); document.getElementById('prev').onclick=()=>show(index-1); dots.forEach((d,i)=>d.onclick=()=>show(i));
+    document.addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key)) show(index+1); if(['ArrowLeft','PageUp'].includes(e.key)) show(index-1);});
+    const initial=Number(location.hash.slice(1)); if(initial>=1&&initial<=slides.length)show(initial-1);
+  </script>
+</body>
+</html>

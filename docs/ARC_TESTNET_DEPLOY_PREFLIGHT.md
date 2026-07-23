@@ -49,7 +49,7 @@ The official lifecycle is:
 5. provider: `submit(jobId, deliverableHash, optParams)`
 6. evaluator: `complete(jobId, reasonHash, optParams)`
 
-The reference flow proves a completed, receipt-backed escrow job. A timeout/refund path must be verified from the reference contract's documented lifecycle before it is claimed; do not map the custom fallback contract's refund function onto the reference contract without that verification.
+The reference flow proves a completed, receipt-backed escrow job. The ERC-8183 specification also defines the timeout/refund path: after `expiredAt`, any caller may use `claimRefund(jobId)` while the job is Funded or Submitted; the contract marks it Expired and returns escrow to the client. The reference-contract ABI/function selector must be verified in the dry-run before broadcast.
 
 ## Superseded custom deploy gate
 

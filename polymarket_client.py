@@ -1,4 +1,4 @@
-"""Polymarket public Gamma/CLOB read-only adaptörü; auth veya trade içermez."""
+"""Read-only Polymarket public Gamma/CLOB adapter; contains no authentication or trading."""
 
 from __future__ import annotations
 
@@ -36,7 +36,7 @@ def normalize_book(payload: dict[str, Any]) -> BookSnapshot:
 
 
 def fetch_book(token_id: str, *, timeout_seconds: int = 15) -> BookSnapshot:
-    """Tek CLOB snapshot getirir; non-2xx ve geçersiz JSON çağırana yükseltilir."""
+    """Fetches one CLOB snapshot; raises non-2xx responses and invalid JSON to the caller."""
     url = f"{CLOB_BOOK_URL}?{urlencode({'token_id': token_id})}"
     request = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
     with urlopen(request, timeout=timeout_seconds) as response:
@@ -44,17 +44,17 @@ def fetch_book(token_id: str, *, timeout_seconds: int = 15) -> BookSnapshot:
 
 
 def resolve_token_id(market_id: str, outcome: str, *, timeout_seconds: int = 15) -> str:
-    """Aktif Gamma marketinden Yes/No outcome için CLOB token ID bulur."""
+    """Resolves the CLOB token ID for a Yes/No outcome from an active Gamma market."""
     url = f"{GAMMA_MARKETS_URL}?{urlencode({'id': market_id, 'active': 'true', 'closed': 'false'})}"
     request = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
     with urlopen(request, timeout=timeout_seconds) as response:
         markets = json.load(response)
     if not markets:
-        raise LookupError(f"Aktif market bulunamadı: {market_id}")
+        raise LookupError(f"Active market not found: {market_id}")
     market = markets[0]
     outcomes = json.loads(market["outcomes"])
     token_ids = json.loads(market["clobTokenIds"])
     try:
         return token_ids[outcomes.index(outcome)]
     except ValueError as exc:
-        raise LookupError(f"Outcome bulunamadı: {outcome}") from exc
+        raise LookupError(f"Outcome not found: {outcome}") from exc

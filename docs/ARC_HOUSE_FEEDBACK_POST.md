@@ -1,8 +1,8 @@
-# Arc House / Discord — Teknik Feedback Postu
+# Arc House / Discord — Technical Feedback Post
 
-> Bu metin paylaşım için taslaktır; henüz Arc House veya Discord'a gönderilmedi.
+> This is a draft for publication; it has not yet been sent to Arc House or Discord.
 
-## Başlık
+## Title
 
 **Feedback request: verifiable, read-only prediction-market analysis jobs on Arc**
 
@@ -42,10 +42,10 @@ Questions:
 
 I’m looking for architecture feedback, not trading advice or promotion. Happy to share the sanitized code/demo once it is published.
 
-## Yayın öncesi kontrol
+## Pre-publication checklist
 
-- `<PUBLIC_REPO_OR_DEMO_URL>` yerini gerçek public URL ile değiştir.
-- Yalnız çalışır, sanitise edilmiş repo/demoyu bağla.
-- Wallet adresi, API key, `.env`, recovery file veya private log paylaşma.
-- “test-USDC” dışında ödül/airdrop/rol talebi ekleme.
-- Paylaşım sonrası gelen somut feedback'i `docs/` altında tarihli not olarak kaydet; Arc House'a ikinci post atmak yerine aynı başlığı güncelle.
+- Replace `<PUBLIC_REPO_OR_DEMO_URL>` with the actual public URL.
+- Link only a working, sanitized repository/demo.
+- Do not share wallet addresses, API keys, `.env`, recovery files, or private logs.
+- Do not request rewards, airdrops, or roles beyond “test-USDC”.
+- Record concrete feedback received after publication in a dated note under `docs/`; update the same Arc House thread instead of posting a second one.

@@ -90,7 +90,7 @@ def test_analyze_endpoint_rejects_non_positive_size_before_runner():
     )
 
     assert status == "422 Unprocessable Content"
-    assert body == {"error": {"code": "invalid_request", "message": "size pozitif ve sonlu bir decimal olmalı"}}
+    assert body == {"error": {"code": "invalid_request", "message": "size must be a positive, finite decimal"}}
     assert called is False
 
 
@@ -101,7 +101,7 @@ def test_analyze_endpoint_rejects_missing_required_field():
     status, _, body = _request(app, payload=json.dumps({"outcome": "Yes", "action": "BUY", "size": "10"}).encode())
 
     assert status == "400 Bad Request"
-    assert body == {"error": {"code": "invalid_request", "message": "market_id zorunlu bir string alanıdır"}}
+    assert body == {"error": {"code": "invalid_request", "message": "market_id is a required string field"}}
 
 
 def test_analyze_endpoint_rejects_unsupported_action_before_runner():
@@ -114,7 +114,7 @@ def test_analyze_endpoint_rejects_unsupported_action_before_runner():
     )
 
     assert status == "422 Unprocessable Content"
-    assert body == {"error": {"code": "invalid_request", "message": "action BUY veya SELL olmalı"}}
+    assert body == {"error": {"code": "invalid_request", "message": "action must be BUY or SELL"}}
 
 
 def test_analyze_endpoint_rejects_malformed_json_before_runner():
@@ -124,7 +124,7 @@ def test_analyze_endpoint_rejects_malformed_json_before_runner():
     status, _, body = _request(app, payload=b"{")
 
     assert status == "400 Bad Request"
-    assert body == {"error": {"code": "invalid_request", "message": "body geçerli JSON object olmalı"}}
+    assert body == {"error": {"code": "invalid_request", "message": "body must be a valid JSON object"}}
 
 
 def test_analyze_endpoint_allows_only_post_to_versioned_path():
@@ -135,7 +135,7 @@ def test_analyze_endpoint_allows_only_post_to_versioned_path():
 
     assert status == "405 Method Not Allowed"
     assert headers["Allow"] == "POST"
-    assert body == {"error": {"code": "method_not_allowed", "message": "yalnız POST desteklenir"}}
+    assert body == {"error": {"code": "method_not_allowed", "message": "only POST is supported"}}
 
 
 def test_analyze_endpoint_rejects_body_larger_than_8_kib_before_parsing():
@@ -155,7 +155,7 @@ def test_api_returns_404_for_other_paths_before_parsing():
     status, _, body = _request(app, path="/v1/other", payload=b"{")
 
     assert status == "404 Not Found"
-    assert body == {"error": {"code": "not_found", "message": "path bulunamadı"}}
+    assert body == {"error": {"code": "not_found", "message": "path not found"}}
 
 
 def test_local_server_cli_defaults_to_loopback_and_port_8080():
@@ -188,7 +188,7 @@ def test_analyze_endpoint_maps_market_lookup_error_without_leaking_details():
     )
 
     assert status == "404 Not Found"
-    assert body == {"error": {"code": "market_or_outcome_not_found", "message": "market veya outcome bulunamadı"}}
+    assert body == {"error": {"code": "market_or_outcome_not_found", "message": "market or outcome not found"}}
 
 
 def test_analyze_endpoint_maps_public_source_error_without_leaking_details():
@@ -201,7 +201,7 @@ def test_analyze_endpoint_maps_public_source_error_without_leaking_details():
     )
 
     assert status == "502 Bad Gateway"
-    assert body == {"error": {"code": "public_source_unavailable", "message": "public market data geçici olarak erişilemez"}}
+    assert body == {"error": {"code": "public_source_unavailable", "message": "public market data is temporarily unavailable"}}
 
 
 def test_analyze_endpoint_rejects_negative_content_length_before_reading_body():
@@ -228,4 +228,4 @@ def test_analyze_endpoint_hides_unexpected_runner_error():
     )
 
     assert status == "500 Internal Server Error"
-    assert body == {"error": {"code": "analysis_failed", "message": "analysis tamamlanamadı"}}
+    assert body == {"error": {"code": "analysis_failed", "message": "analysis could not be completed"}}

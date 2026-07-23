@@ -1,4 +1,4 @@
-"""Public Polymarket request'lerini read-only OutcomeRail artifact'ine dönüştürür."""
+"""Converts public Polymarket requests into read-only OutcomeRail artifacts."""
 from __future__ import annotations
 
 from dataclasses import dataclass

@@ -1,1 +1,1 @@
-"""Read-only OutcomeRail demo araçları."""
+"""Read-only OutcomeRail demo tools."""

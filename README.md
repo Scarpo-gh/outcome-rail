@@ -1,69 +1,69 @@
 # OutcomeRail
 
-Prediction-market veri kaynakları için **execution-feasibility ve provenance receipt** altyapısı.
+A **read-only execution-feasibility and provenance-receipt layer** for public prediction-market data.
 
-> Prototype / hackathon V1. Eğitimsel/geliştirici altyapısıdır; trade, wagering, custody, yatırım tavsiyesi veya kârlılık garantisi sunmaz.
+> Prototype / hackathon V1. This is educational developer infrastructure. It does not provide trading, wagering, custody, investment advice, or profitability guarantees.
 
-## V1 mevcut kapsamı
+## V1 scope
 
-- Simüle edilmiş yön için visible orderbook seviyelerinden requested-size VWAP (bu bir emir veya öneri değildir)
-- `PROCEED`, `REDUCE`, `BLOCK` execution-feasibility verdict'leri
-- Top-of-book spread ve görünür derinlik kanıtı
-- Deterministik SHA-256 report hash
-- Canonical, off-chain doğrulanabilir execution receipt: snapshot, input, politika ve sonucu tek hash'e bağlar
-- İlk public-data adapter olarak read-only Polymarket Gamma/CLOB snapshot adaptörü
+- Requested-size VWAP from visible order-book levels for a simulated direction; this is not an order or recommendation.
+- `PROCEED`, `REDUCE`, and `BLOCK` execution-feasibility verdicts.
+- Top-of-book spread and visible-depth evidence.
+- Deterministic SHA-256 report hashes.
+- Canonical, off-chain verifiable execution receipts that bind a snapshot, input, policy, and result into one hash.
+- A read-only Polymarket Gamma/CLOB snapshot adapter as the first public-data adapter.
 
-## Karar kuralları
+## Decision rules
 
-| Sonuç | Kural |
+| Verdict | Rule |
 |---|---|
-| `PROCEED` | İstenen boyut görünür defterde tamamen karşılanıyor. |
-| `REDUCE` | Boyutun en az yarısı ama tamamı görünür. |
-| `BLOCK` | Boyutun yarısından azı görünür. |
+| `PROCEED` | The requested size is fully supported by the visible book. |
+| `REDUCE` | At least half, but not all, of the requested size is visible. |
+| `BLOCK` | Less than half of the requested size is visible. |
 
-Bu yalnızca visible liquidity değerlendirmesidir. Public CLOB adaptörü snapshot `timestamp` ve `hash` değerlerini de taşır; V1 REST snapshot kullanır ve stale/HTTP hatalarını sessizce gizlemez.
+This is only a visible-liquidity assessment. The public CLOB adapter also carries the snapshot `timestamp` and `hash`; V1 uses REST snapshots and does not silently hide stale-data or HTTP failures.
 
-## Receipt kanıtı
+## Receipt evidence
 
-`receipt.py`, işlem öncesi analiz için off-chain bir makbuz üretir. Receipt; tam orderbook snapshot content hash'ini, CLOB kaynak metadata'sını, istenen boyutu/yönü, politika kimliği-sürümünü ve `PROCEED`/`REDUCE`/`BLOCK` sonucunu tek SHA-256 hash'e bağlar. `verify_execution_receipt()` sonradan değiştirilmiş bir alanı reddeder.
+`receipt.py` produces an off-chain receipt for pre-execution analysis. The receipt binds the full order-book snapshot content hash, CLOB source metadata, requested size and direction, policy identifier and version, and the `PROCEED` / `REDUCE` / `BLOCK` result into one SHA-256 hash. `verify_execution_receipt()` rejects a modified field.
 
-Bu V1 receipt'i **finansal settlement, bahis veya yatırım sinyali değildir**: trade, custody, ödeme, otomatik emir veya kârlılık iddiası yoktur. Polymarket yalnız ilk public-data adapter'dır; ürün kimlik bilgisi, hesap veya erişim engeli aşma işlevi içermez.
+This V1 receipt is **not financial settlement, a wager, or an investment signal**: it does not perform trading, custody, payments, automated orders, or make profitability claims. Polymarket is only the first public-data adapter; the product has no credential, account, or access-restriction-bypass functionality.
 
 ## Policy v1.1 guardrails
 
-`policy.py`, base VWAP raporunu yalnız daha temkinli hale getirir; `BLOCK` kararını asla gevşetmez. Varsayılan policy:
+`policy.py` can only make the base VWAP report more conservative; it never relaxes a `BLOCK` verdict. The default policy is:
 
-- Snapshot yaşı > 30 saniye veya parse edilemeyen/gelecek kaynak zamanı → `BLOCK` (`STALE_SNAPSHOT`)
-- Spread > 0.03 → `REDUCE` (`WIDE_SPREAD`)
-- İşlem yönündeki book seviyelerinde en büyük fiyat boşluğu > 0.02 → `REDUCE` (`LARGE_PRICE_GAP`)
+- Snapshot age over 30 seconds, or an unparsable/future source timestamp → `BLOCK` (`STALE_SNAPSHOT`).
+- Spread over 0.03 → `REDUCE` (`WIDE_SPREAD`).
+- Largest price gap across book levels in the requested direction over 0.02 → `REDUCE` (`LARGE_PRICE_GAP`).
 
-Policy'nin eşikleri ve content hash'i receipt'e yazılır. Gerçek, public bir token için yalnız read-only demo:
+The policy thresholds and content hash are written to the receipt. Run a read-only demo against a real public token:
 
 ```bash
-# Tercih edilen public market yolu
+# Preferred public-market path
 python3 scripts/demo_receipt.py --market-id <gamma-market-id> --outcome Yes --action BUY --size 10
 
-# Alternatif: bilinen public CLOB token id ile
+# Alternative: known public CLOB token ID
 python3 scripts/demo_receipt.py --token-id <public-clob-token-id> --action BUY --size 10
 ```
 
-Market yolu Gamma'dan outcome token'ını çözer ve receipt'e canonical input manifest hash'ini de bağlar. Manifest ayrıca kullanılan public Gamma market ve CLOB book endpoint URL'lerini hash kapsamına alır; CLOB'un kaynak timestamp/hash'i receipt snapshot'ında korunur. Market komutu varsayılan olarak `evidence/outcomerail.jsonl` içine yerel, hash-zincirli bir evidence entry yazar; bu dosya git'e dahil edilmez. Bu log yerel filesystem yazma erişimine karşı tek başına immutable değildir. Bütünlüğü aynı dosya içinde doğrulamak için:
+The market path resolves the outcome token through Gamma and also binds a canonical input-manifest hash to the receipt. The manifest covers the public Gamma market and CLOB book endpoint URLs; the CLOB source timestamp and hash are retained in the receipt snapshot. By default, the market command writes a local hash-chained evidence entry to `evidence/outcomerail.jsonl`; that file is not committed. This log alone is not immutable against local filesystem write access. Verify its internal integrity with:
 
 ```bash
 python3 scripts/verify_evidence.py --log evidence/outcomerail.jsonl
 ```
 
-Arc anchor komutu deneysel ve public demo kapsamı dışındadır: zincire işlem gönderir. Yalnız ayrı açık onayla, testnet'te ve local credential'larla çalıştırılmalıdır.
+The Arc anchor command is experimental and outside the public-demo scope because it broadcasts a transaction. Run it only with separate explicit approval, on testnet, and with local credentials.
 
-Kaynak botlardan alınabilecek/ayrıştırılan yetenekler: [`docs/SOURCE_ADAPTATION.md`](docs/SOURCE_ADAPTATION.md).
+Source capabilities that can be adapted: [`docs/SOURCE_ADAPTATION.md`](docs/SOURCE_ADAPTATION.md).
 
-Arc builder görünürlüğü için kısa ürün hikâyesi, canlı demo komutu, doğrulama adımları ve mimari: [`docs/BUILDER_DEMO.md`](docs/BUILDER_DEMO.md).
+For the Arc builder story, live demo command, verification steps, and architecture, see [`docs/BUILDER_DEMO.md`](docs/BUILDER_DEMO.md).
 
 Public demo: [scarpo-gh.github.io/outcome-rail](https://scarpo-gh.github.io/outcome-rail/)
 
 Arc Testnet evidence: [`docs/ARC_EVIDENCE.md`](docs/ARC_EVIDENCE.md). Builder demo script: [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md). Checkpoint presentation: [`docs/checkpoint-2-deck.html`](docs/checkpoint-2-deck.html). Mid-submission video: [`docs/assets/outcomerail-mid-submission-update.mp4`](docs/assets/outcomerail-mid-submission-update.mp4). Mid-submission summary: [`docs/MID_SUBMISSION_SUMMARY.md`](docs/MID_SUBMISSION_SUMMARY.md). Clean-clone verification: [`docs/CLEAN_REPRODUCTION_REPORT.md`](docs/CLEAN_REPRODUCTION_REPORT.md).
 
-## Çalıştırma
+## Run locally
 
 ```bash
 cd outcome-rail
@@ -75,17 +75,17 @@ pytest -q
 
 ## Read-only local API
 
-`POST /v1/analyze`, public market snapshot'ını receipt/manifest ile birlikte döndürür; trade veya evidence log yazımı yapmaz. Local kullanım, `curl` örneği, hata sözleşmesi ve güvenlik sınırları: [`docs/API.md`](docs/API.md).
+`POST /v1/analyze` returns a public market snapshot with its receipt and manifest. It does not trade or write an evidence log. For local usage, a `curl` example, error contract, and security boundaries, see [`docs/API.md`](docs/API.md).
 
 ```bash
 python3 scripts/serve_api.py
 ```
 
-Varsayılan adres yalnız loopback'tir: `http://127.0.0.1:8080`.
+The default address is loopback-only: `http://127.0.0.1:8080`.
 
-## Güvenlik sınırları
+## Security boundaries
 
-- Polymarket trading credential’ı istenmez veya saklanmaz.
-- Otomatik trade yapılmaz.
-- Circle API key, Entity Secret veya recovery file bu projeye konmaz.
-- Arc entegrasyonu, doğrulanmış receipt hash'ini bounded **testnet** analysis-job yaşam döngüsüne bağlar. Gerçek kanıtlar ve Arcscan linkleri: [`docs/BUILDER_DEMO.md`](docs/BUILDER_DEMO.md#arc-ile-bağlantı). Mainnet, gerçek USDC ve kullanıcı fonu kapsam dışıdır.
+- The project does not request or store Polymarket trading credentials.
+- It does not execute automated trades.
+- Circle API keys, Entity Secrets, and recovery files are not included in this repository.
+- The Arc integration binds a verified receipt hash to a bounded **testnet** analysis-job lifecycle. For evidence and Arcscan links, see [`docs/BUILDER_DEMO.md`](docs/BUILDER_DEMO.md#arc-integration). Mainnet, real USDC, and user funds are out of scope.

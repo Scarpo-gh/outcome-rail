@@ -1,23 +1,23 @@
-# OutcomeRail — Arc Builder Demo Paketi
+# OutcomeRail — Arc Builder Demo Package
 
-## Tek cümle
+## One sentence
 
-**OutcomeRail**, ilk public-data adapter olarak Polymarket orderbook snapshot'ını değerlendiren, deterministic bir execution-feasibility/provenance receipt üreten read-only agent altyapısıdır.
+**OutcomeRail** is read-only agent infrastructure that evaluates a Polymarket order-book snapshot through its first public-data adapter and produces a deterministic execution-feasibility/provenance receipt.
 
-> Trade, wagering, custody, wallet veya Polymarket credential istemez; kârlılık, outcome tahmini veya yatırım sonucu garantisi vermez.
+> It does not request trading, wagering, custody, wallet, or Polymarket credentials; it provides no profitability, outcome-prediction, or investment-result guarantees.
 
-## Neyi çözüyor?
+## What it solves
 
-Bir agent ya da kullanıcı “bu outcome için bu boyutta BUY/SELL görünür defterde ne kadar uygulanabilir?” sorusunu sorar. OutcomeRail, yalnız public Gamma ve CLOB verisiyle aşağıdakileri üretir:
+An agent or user may ask: “For this outcome and this size, how feasible is a BUY or SELL against the visible book?” Using only public Gamma and CLOB data, OutcomeRail produces:
 
-- requested-size VWAP ve görünür uygulanabilir miktar;
-- `PROCEED`, `REDUCE` veya `BLOCK` kararı;
-- snapshot freshness, spread ve price-gap guardrail'leri;
-- canonical input manifest;
-- değiştirilmeye karşı SHA-256 ile doğrulanabilen receipt;
-- isteğe bağlı append-only local evidence zinciri.
+- requested-size VWAP and visible executable quantity;
+- a `PROCEED`, `REDUCE`, or `BLOCK` verdict;
+- snapshot-freshness, spread, and price-gap guardrails;
+- a canonical input manifest;
+- a receipt verified against modification with SHA-256; and
+- an optional append-only local evidence chain.
 
-## Çalışan akış
+## Working flow
 
 ```text
 market_id + outcome + BUY/SELL + requested_size
@@ -42,15 +42,15 @@ Canonical manifest ─► execution receipt ─► local evidence entry
 
 Public demo: [https://scarpo-gh.github.io/outcome-rail/](https://scarpo-gh.github.io/outcome-rail/)
 
-Ayrıntılı görsel: [`outcomerail-architecture.html`](outcomerail-architecture.html). Dosya-URL'si tarayıcı/panel tarafından engellenirse, doğrudan görüntülenebilir SVG sürümü: [`outcomerail-architecture.svg`](outcomerail-architecture.svg).
+Detailed visual: [`outcomerail-architecture.html`](outcomerail-architecture.html). If a browser or panel blocks the file URL, use the directly viewable SVG version: [`outcomerail-architecture.svg`](outcomerail-architecture.svg).
 
 ## Read-only local API
 
-CLI dışında agent/tool entegrasyonu için local WSGI endpoint: `POST /v1/analyze`. Contract, `curl` örneği ve hata yüzeyi: [`API.md`](API.md). API yalnız `127.0.0.1` üzerinde başlar; GitHub Pages static demodur ve API host etmez.
+For agent/tool integration outside the CLI, use the local WSGI endpoint: `POST /v1/analyze`. Its contract, `curl` example, and error surface are in [`API.md`](API.md). The API starts only on `127.0.0.1`; GitHub Pages is a static demo and does not host the API.
 
-## 2 dakikalık canlı demo
+## Two-minute live demo
 
-Bu komut yalnız public HTTP okuması yapar. Emir, auth, wallet veya transfer içermez.
+This command performs only public HTTP reads. It does not submit orders or use authentication, wallets, or transfers.
 
 ```bash
 cd /home/hermes/outcome-rail
@@ -61,7 +61,7 @@ python3 scripts/demo_receipt.py \
   --size 10
 ```
 
-Beklenen JSON yüzeyi:
+Expected JSON surface:
 
 ```json
 {
@@ -76,68 +76,65 @@ Beklenen JSON yüzeyi:
 }
 ```
 
-Sonra evidence zincirini doğrula:
+Then verify the evidence chain:
 
 ```bash
 python3 scripts/verify_evidence.py --log evidence/outcomerail.jsonl
 ```
 
-Başarılı doğrulama örneği:
+Example successful verification:
 
 ```json
 {"log":"evidence/outcomerail.jsonl","entries":1,"valid":true}
 ```
 
-## Doğrulanabilirlik iddiası
+## Verifiability claim
 
-Receipt aşağıdakileri tek hash kapsamına alır:
+The receipt binds the following fields into one hash:
 
-- token id, source book timestamp/hash ve snapshot content hash;
-- istenen büyüklük, yön, market id ve outcome;
-- policy id/sürümü/eşikleri/content hash'i;
-- VWAP sonucu, spread, rule id'leri ve verdict;
-- input manifest hash'i ve gözlem zamanı.
+- token ID, source-book timestamp/hash, and snapshot content hash;
+- requested size, direction, market ID, and outcome;
+- policy ID, version, thresholds, and content hash;
+- VWAP result, spread, rule IDs, and verdict; and
+- input-manifest hash and observation time.
 
-`verify_execution_receipt()` bu alanlardan biri sonradan değiştirilirse `false` döndürür. Evidence log ise her kaydı önceki entry hash'ine bağlar.
+`verify_execution_receipt()` returns `false` if any of these fields is modified later. The evidence log binds each entry to the preceding entry hash.
 
-## Arc ile bağlantı
+## Arc integration
 
-Ürün katmanı off-chain/read-only kalır. Arc Testnet üzerinde ise OutcomeRail için
-iki **test-USDC** ERC-8183 kanıtı üretildi. Bunlar trade, wager veya kullanıcı
-fonu değildir; ayrı test walletlar arasında bounded analysis-job demonstrasyonudur.
+The product layer remains off-chain and read-only. On Arc Testnet, two **test-USDC** ERC-8183 proofs were produced for OutcomeRail. They are not trading, wagers, or user funds; they are a bounded analysis-job demonstration between separate test wallets.
 
-### Job A — receipt teslimi ve complete
+### Job A — receipt delivery and completion
 
 - Job ID: `159281`
 - Verified OutcomeRail receipt hash: `0x2257db655f069e89c00ff637e36c46612911d5eb3f80fa4d96c68a381c76a02b`
 - [createJob](https://testnet.arcscan.app/tx/0x7c5fb3eb26fb6df90eb26af43a8a898dc30d6eb54703ea763849ca0b8f16a635) → [setBudget](https://testnet.arcscan.app/tx/0x8124665d7d6433baa3de320ac9be10f7e3b488ffc4b3ae898d3c5b54896d4d77) → [approve](https://testnet.arcscan.app/tx/0x00d55da8eadb78aa43dc7a36bedb58540c2c60d2cef5709b7f74e1a9e1252615) → [fund](https://testnet.arcscan.app/tx/0x71cb7cfd7521286ee742468c57255dd80a8d76a6de3fef791eac63582bdea589) → [submit](https://testnet.arcscan.app/tx/0x40659649ee965ce59de1fe0f985d6fff89d1de8958521ca6460e0dc9309f832e) → [complete](https://testnet.arcscan.app/tx/0x5968dfe24910eb734fcaaa96cfa7afc9152fbb3611b271f211f1d801312a5ea7)
 
-### Job B — expiry ve refund
+### Job B — expiry and refund
 
 - Job ID: `159283`
 - [createJob](https://testnet.arcscan.app/tx/0x5778d7a58a5246c0f273a85c208d695577312ed10b8fd561f0c2c0106b6a0f04) → [setBudget](https://testnet.arcscan.app/tx/0x45275f5878ddefd78d0cb5c8c65927e6c98f7948d334494e5a451cbd781b46c7) → [approve](https://testnet.arcscan.app/tx/0x49a012b36f86add4e3c45b70240a5909765434cb7825b690679f0af4b039291c) → [fund](https://testnet.arcscan.app/tx/0x88ba57c48791d2d689ef5e65e3768215a0c8229e226c294d7969aa0cd25d710e) → [claimRefund](https://testnet.arcscan.app/tx/0x94865921d18d15f0c9c3391c0cd7eaa17b887651fc74b0af4bf6ec0e5f565f4e)
 
-Bu kanıtlar yalnız testnet demonstrasyonudur: mainnet, gerçek USDC, custody,
-wallet-connect veya otomatik trade içermez.
+These proofs are testnet-only: they involve no mainnet, real USDC, custody, wallet-connect, or automated trading.
 
-## Builder feedback isteği
+## Builder feedback request
 
-Arc House/Discord için kopyalanabilir İngilizce taslak: [`ARC_HOUSE_FEEDBACK_POST.md`](ARC_HOUSE_FEEDBACK_POST.md). Bu taslak henüz yayımlanmadı.
+For a copyable English draft for Arc House/Discord, see [`ARC_HOUSE_FEEDBACK_POST.md`](ARC_HOUSE_FEEDBACK_POST.md). It has not been published.
 
-Aradığımız feedback spesifik:
+The requested feedback is specific:
 
-1. Agent'ın ödeyeceği analiz işi için minimum deliverable ne olmalı: yalnız receipt mi, yoksa signed callback/API response mu?
-2. Freshness, spread ve price-gap eşikleri market türüne göre nasıl sürümlenmeli?
-3. Test-USDC escrow/release modeli Arc üzerinde bu iş için en sade ve doğrulanabilir nasıl kurulmalı?
+1. What is the minimum deliverable for an agent-paid analysis job: only a receipt, or a signed callback/API response as well?
+2. How should freshness, spread, and price-gap thresholds be versioned by market type?
+3. What is the simplest, verifiable test-USDC escrow/release model for this job on Arc?
 
-## Bilerek kapsam dışı
+## Explicitly out of scope
 
-- Emir gönderme, otomatik trade, cüzdan bağlama veya custody
-- Kullanıcı fonu, settlement veya gerçek para akışı
-- LLM tabanlı fiyat tahmini ya da yatırım tavsiyesi
-- Private WebSocket, private Polymarket credential veya kişisel veri
+- Order submission, automated trading, wallet connection, or custody.
+- User funds, settlement, or real-money flows.
+- LLM-based price prediction or investment advice.
+- Private WebSockets, private Polymarket credentials, or personal data.
 
-## Tekrar üretim
+## Reproduce
 
 ```bash
 cd /home/hermes/outcome-rail
@@ -145,4 +142,4 @@ python3 -m py_compile analysis_manifest.py analysis_job.py policy.py receipt.py 
 pytest -q
 ```
 
-Demo paketinin teknik sınırları için ayrıca [`SOURCE_ADAPTATION.md`](SOURCE_ADAPTATION.md) dosyasına bakın.
+For the demo package’s technical boundaries, also see [`SOURCE_ADAPTATION.md`](SOURCE_ADAPTATION.md).

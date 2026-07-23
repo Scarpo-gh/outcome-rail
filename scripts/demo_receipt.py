@@ -1,4 +1,4 @@
-"""Public CLOB snapshot'ından read-only OutcomeRail policy + receipt demosu."""
+"""Read-only OutcomeRail policy and receipt demo from a public CLOB snapshot."""
 
 from __future__ import annotations
 
@@ -36,7 +36,7 @@ def build_demo_receipt(
     observed_at: str,
     fetcher: Callable[[str], BookSnapshot] = fetch_book,
 ) -> dict:
-    """Snapshot alır; trade göndermeden policy sonucu ve doğrulanmış receipt döndürür."""
+    """Fetches a snapshot and returns a policy result and verified receipt without sending a trade."""
     snapshot = fetcher(token_id)
     base_report = analyze_execution(
         action=action,
@@ -77,10 +77,10 @@ def main() -> None:
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--token-id", help="Public Polymarket CLOB token id")
     source.add_argument("--market-id", help="Public Polymarket Gamma market id")
-    parser.add_argument("--outcome", help="Market yolu için outcome (ör. Yes)")
+    parser.add_argument("--outcome", help="Outcome for the market path (for example, Yes)")
     parser.add_argument("--action", choices=("BUY", "SELL"), required=True)
-    parser.add_argument("--size", required=True, help="İstenen kontrat miktarı")
-    parser.add_argument("--evidence-log", default="evidence/outcomerail.jsonl", help="Append-only local evidence log yolu; market yolunda kullanılır")
+    parser.add_argument("--size", required=True, help="Requested contract quantity")
+    parser.add_argument("--evidence-log", default="evidence/outcomerail.jsonl", help="Append-only local evidence-log path; used by the market path")
     args = parser.parse_args()
     observed_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     if args.market_id:

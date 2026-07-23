@@ -1,4 +1,4 @@
-"""Son doğrulanmış OutcomeRail evidence hash'ini Arc Testnet'e self-call olarak anchorlar."""
+"""Anchors the most recently verified OutcomeRail evidence hash to Arc Testnet as a self-call."""
 from __future__ import annotations
 
 import argparse
@@ -19,10 +19,10 @@ from evidence_log import verify_evidence_log
 def latest_verified_entry_hash(log_path: str | Path) -> str:
     path = Path(log_path)
     if not verify_evidence_log(path):
-        raise ValueError("evidence log bütünlüğü geçersiz")
+        raise ValueError("evidence-log integrity is invalid")
     rows = [json.loads(line) for line in path.read_text().splitlines() if line]
     if not rows:
-        raise ValueError("evidence log boş")
+        raise ValueError("evidence log is empty")
     return rows[-1]["entry_hash"]
 
 
@@ -47,9 +47,9 @@ def main() -> int:
             print(json.dumps({"entry_hash": entry_hash, "tx_hash": tx.tx_hash, "arcscan": f"https://testnet.arcscan.app/tx/{tx.tx_hash}"}, separators=(",", ":")))
             return 0
         if tx.state == "FAILED":
-            raise RuntimeError("Circle anchor transaction başarısız")
+            raise RuntimeError("Circle anchor transaction failed")
         time.sleep(2)
-    raise TimeoutError("Anchor transaction 60 saniye içinde tamamlanmadı")
+    raise TimeoutError("Anchor transaction did not complete within 60 seconds")
 
 
 if __name__ == "__main__":

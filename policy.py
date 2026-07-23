@@ -1,4 +1,4 @@
-"""OutcomeRail için sürümlü, deterministik execution politikaları."""
+"""Versioned, deterministic execution policies for OutcomeRail."""
 
 from __future__ import annotations
 
@@ -28,9 +28,9 @@ class ExecutionPolicy:
         if not self.policy_id or not self.version:
             raise ValueError("policy_id ve version zorunlu")
         if self.max_snapshot_age_seconds <= 0:
-            raise ValueError("max_snapshot_age_seconds pozitif olmalı")
+            raise ValueError("max_snapshot_age_seconds must be positive")
         if self.max_spread <= 0 or self.max_price_gap <= 0:
-            raise ValueError("price eşikleri pozitif olmalı")
+            raise ValueError("price thresholds must be positive")
 
     def to_dict(self) -> dict:
         return {
@@ -66,7 +66,7 @@ def _parse_timestamp(raw_timestamp: str) -> datetime:
     normalized = raw_timestamp.replace("Z", "+00:00")
     timestamp = datetime.fromisoformat(normalized)
     if timestamp.tzinfo is None:
-        raise ValueError("timestamp UTC timezone içermeli")
+        raise ValueError("timestamp must include a UTC timezone")
     return timestamp.astimezone(timezone.utc)
 
 
@@ -83,7 +83,7 @@ def evaluate_policy(
     policy: ExecutionPolicy,
     action: str = "BUY",
 ) -> PolicyEvaluation:
-    """Base raporu yalnız daha temkinli hale getiren deterministik policy katmanı."""
+    """Deterministic policy layer that can only make the base report more conservative."""
     try:
         observed = _parse_timestamp(observed_at)
         source = _parse_timestamp(snapshot.source_timestamp or "")
@@ -93,7 +93,7 @@ def evaluate_policy(
 
     normalized_action = action.upper()
     if normalized_action not in {"BUY", "SELL"}:
-        raise ValueError("action BUY veya SELL olmalı")
+        raise ValueError("action must be BUY or SELL")
     price_gap = _max_price_gap(snapshot.asks if normalized_action == "BUY" else snapshot.bids)
     metrics: dict[str, str | None] = {
         "max_price_gap": str(price_gap),

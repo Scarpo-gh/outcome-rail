@@ -1,4 +1,4 @@
-"""OutcomeRail evidence log bütünlük doğrulama CLI'ı."""
+"""OutcomeRail evidence-log integrity verification CLI."""
 from __future__ import annotations
 
 import argparse
@@ -11,7 +11,7 @@ from evidence_log import verify_evidence_log
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Append-only OutcomeRail evidence log doğrula")
+    parser = argparse.ArgumentParser(description="Verify an append-only OutcomeRail evidence log")
     parser.add_argument("--log", required=True, help="JSONL evidence log yolu")
     path = Path(parser.parse_args().log)
     valid = verify_evidence_log(path)

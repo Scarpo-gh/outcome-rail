@@ -45,7 +45,7 @@ class AnalysisInputManifest:
 def build_input_manifest(**kwargs: str) -> AnalysisInputManifest:
     action = kwargs["action"].upper()
     if action not in {"BUY", "SELL"} or Decimal(kwargs["requested_size"]) <= 0:
-        raise ValueError("action BUY/SELL ve requested_size pozitif olmalı")
+        raise ValueError("action must be BUY/SELL and requested_size must be positive")
     for name in ("market_id", "outcome", "token_id", "observed_at", "snapshot_content_hash", "policy_content_hash"):
         if not kwargs[name]:
             raise ValueError(f"{name} zorunlu")

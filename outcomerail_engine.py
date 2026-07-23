@@ -1,4 +1,4 @@
-"""OutcomeRail'in deterministik orderbook execution-quality hesapları."""
+"""Deterministic order-book execution-quality calculations for OutcomeRail."""
 
 from __future__ import annotations
 
@@ -39,10 +39,10 @@ def analyze_execution(
     asks: Iterable[tuple[str, str]],
     requested_size: str,
 ) -> ExecutionReport:
-    """Görünür defter derinliğine göre BUY/SELL uygulanabilirliğini değerlendirir."""
+    """Assesses BUY/SELL feasibility from visible order-book depth."""
     normalized_action = action.upper()
     if normalized_action not in {"BUY", "SELL"}:
-        raise ValueError("action BUY veya SELL olmalı")
+        raise ValueError("action must be BUY or SELL")
 
     bid_levels = tuple(sorted(bids, key=lambda level: Decimal(level[0]), reverse=True))
     ask_levels = tuple(sorted(asks, key=lambda level: Decimal(level[0])))
@@ -81,10 +81,10 @@ def analyze_execution(
 def estimate_vwap(
     levels: Iterable[tuple[str, str]], requested_size: str
 ) -> VwapEstimate:
-    """İstenen kontrat büyüklüğünü sıralı fiyat seviyelerinde simüle eder."""
+    """Simulates the requested contract size through ordered price levels."""
     requested = Decimal(requested_size)
     if requested <= 0:
-        raise ValueError("requested_size pozitif olmalı")
+        raise ValueError("requested_size must be positive")
 
     remaining = requested
     notional = Decimal("0")
@@ -109,7 +109,7 @@ def estimate_vwap(
 
 
 def canonical_report_hash(report: ExecutionReport, *, snapshot_timestamp: str) -> str:
-    """Rapor kanıtını hash'lemek için sürümlenebilir, deterministik payload üretir."""
+    """Builds a versionable, deterministic payload for hashing report evidence."""
     payload = {
         "expected_price": str(report.expected_price) if report.expected_price is not None else None,
         "executable_size": str(report.executable_size),

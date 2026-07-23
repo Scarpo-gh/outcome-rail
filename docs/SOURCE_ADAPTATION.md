@@ -1,38 +1,38 @@
-# OutcomeRail — Kaynak Botlardan Adaptasyon Haritası
+# OutcomeRail — Source-Bot Adaptation Map
 
-## Doğrudan alınan tasarım
+## Design adopted directly
 
-| Kaynak | Kanıt | OutcomeRail karşılığı |
+| Source | Evidence | OutcomeRail counterpart |
 |---|---|---|
-| bot_v21 | Requested-size derinlik, orderbook gap ve exit-depth riskleri | V1'in requested-size VWAP / visible-depth kararı. Pozisyon yönetimi veya emir işlemleri taşınmadı. |
-| PolyProbe | Gamma metadata + CLOB orderbook'u birlikte kullanma; Cloudflare sorunlarında resmi CLOB SDK tercihi | Read-only Gamma/CLOB adaptörü; `BookSnapshot` kaynak zamanını ve CLOB hash'ini korur. |
-| ProBot | LLM'den önce deterministik pre-filter; append-only analiz kaydı | Receipt önce deterministik snapshot + politika + sonuç ile kuruldu. LLM sinyalleri ancak ayrı, sürümlü analiz girdisi olarak eklenebilir. |
+| bot_v21 | Requested-size depth, order-book gaps, and exit-depth risks. | V1 requested-size VWAP / visible-depth verdict. Position management and order operations were not transferred. |
+| PolyProbe | Combined Gamma metadata and CLOB order books; preference for the official CLOB SDK during Cloudflare issues. | Read-only Gamma/CLOB adapter; `BookSnapshot` retains source time and CLOB hash. |
+| ProBot | Deterministic pre-filter before an LLM; append-only analysis record. | The receipt is first built from a deterministic snapshot, policy, and result. LLM signals can be added only as a separate, versioned analysis input. |
 
-## V1 receipt sınırı
+## V1 receipt boundary
 
-`receipt.py` şu alanları tek SHA-256 kanıtına bağlar:
+`receipt.py` binds the following fields into one SHA-256 proof:
 
-- Token kimliği, CLOB kaynak zamanı/hash'i ve tam snapshot content hash'i
-- İstenen boyut ve `BUY` / `SELL` yönü
-- Politika kimliği ve sürümü
-- VWAP sonucu, visible execution size, spread, karar ve kural kimlikleri
-- OutcomeRail'in gözlem zamanı
+- Token ID, CLOB source time/hash, and full snapshot content hash.
+- Requested size and `BUY` / `SELL` direction.
+- Policy identifier and version.
+- VWAP result, visible execution size, spread, verdict, and rule identifiers.
+- OutcomeRail observation time.
 
-Receipt doğrulaması değiştirilen verdict, politika, snapshot veya input'u reddeder.
+Receipt verification rejects a modified verdict, policy, snapshot, or input.
 
-## Bilerek taşınmayanlar
+## Intentionally excluded
 
-- bot_v21'in order placement, rebalance, position state ve private WebSocket katmanları: OutcomeRail trade yapmayan bir pre-trade analiz ürünü olarak kalır.
-- bot_v21'in reward/Q-score mantığı: LP özelindedir; genel execution-quality kararına karıştırılmaz.
-- ProBot'un LLM, external sports data ve whale yorumları: kaynak/kanıt sürümü ayrı tasarlanmadan receipt'e yazılmaz. LLM çıktılarını doğrudan finansal karar gibi sabitlemek doğru değildir.
-- PolyProbe'un Telegram/UI ve kullanıcı analitiği: presentation/distribution katmanıdır, çekirdeğe alınmaz.
+- bot_v21 order placement, rebalancing, position state, and private WebSocket layers: OutcomeRail remains a non-trading pre-execution analysis product.
+- bot_v21 reward/Q-score logic: it is LP-specific and is not mixed into the general execution-quality verdict.
+- ProBot LLM, external sports data, and whale commentary: they are not written into a receipt before source/evidence versioning is designed separately. LLM output must not be fixed as a direct financial decision.
+- PolyProbe Telegram/UI and user analytics: these are presentation/distribution layers and are not imported into the core.
 
-## Sonraki güvenli genişletme
+## Next safe extensions
 
-1. **Policy v1.1 (tamamlandı):** max spread, max gap ve snapshot age parametrik kuralları; policy payload/content hash'i receipt'e dahil edildi.
-2. **Analysis input manifest:** ProBot benzeri dış veri/LLM kullanılırsa, ham kaynağın hash'i, sağlayıcı, timestamp ve güven seviyesi ayrı manifest olarak receipt'e bağlanır.
-3. **Arc provenance:** Ancak açık onayla, receipt hash'i için yeni bir Arc testnet anchor işlemi yapılır. Mevcut test transferi ürün receipt'i değildir; yalnız proje-level teknik kanıttır.
+1. **Policy v1.1 (completed):** parameterized max-spread, max-gap, and snapshot-age rules; the policy payload/content hash is included in the receipt.
+2. **Analysis input manifest:** when ProBot-like external data or an LLM is used, bind the raw-source hash, provider, timestamp, and confidence level in a separate manifest.
+3. **Arc provenance:** a new Arc Testnet anchor transaction for a receipt hash may occur only with explicit approval. The existing test transfer is not a product receipt; it is only project-level technical evidence.
 
-## Güvenlik
+## Security
 
-İçe aktarma denetiminde `alerts_ws.log`, `positions_ws_archive.jsonl` ve `events.db` ürün koduna alınmadı. Private credential/config dosyaları okunmadı ve OutcomeRail'e kopyalanmadı.
+During import review, `alerts_ws.log`, `positions_ws_archive.jsonl`, and `events.db` were not brought into product code. Private credential/configuration files were not read or copied into OutcomeRail.

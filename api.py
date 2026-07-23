@@ -1,4 +1,4 @@
-"""OutcomeRail için dependency-free, read-only WSGI Analysis API."""
+"""Dependency-free, read-only WSGI Analysis API for OutcomeRail."""
 from __future__ import annotations
 
 import json
@@ -12,7 +12,7 @@ MAX_BODY_BYTES = 8192
 
 
 class InvalidRequest(ValueError):
-    """HTTP 4xx döndürülecek client input hatası."""
+    """Client-input error returned as HTTP 4xx."""
 
     def __init__(self, message: str, status: str = "400 Bad Request", code: str = "invalid_request"):
         super().__init__(message)
@@ -47,7 +47,7 @@ def _parse_payload(environ: dict[str, Any]) -> dict[str, Any]:
     try:
         content_length = int(environ.get("CONTENT_LENGTH", "0"))
     except ValueError as exc:
-        raise InvalidRequest("body geçerli JSON object olmalı") from exc
+        raise InvalidRequest("body must be a valid JSON object") from exc
     if content_length < 0:
         raise InvalidRequest("Content-Length negatif olamaz")
     if content_length > MAX_BODY_BYTES:
@@ -60,52 +60,52 @@ def _parse_payload(environ: dict[str, Any]) -> dict[str, Any]:
         raw = environ["wsgi.input"].read(content_length)
         payload = json.loads(raw.decode("utf-8"))
     except (UnicodeDecodeError, ValueError, json.JSONDecodeError) as exc:
-        raise InvalidRequest("body geçerli JSON object olmalı") from exc
+        raise InvalidRequest("body must be a valid JSON object") from exc
     if not isinstance(payload, dict):
-        raise InvalidRequest("body geçerli JSON object olmalı")
+        raise InvalidRequest("body must be a valid JSON object")
     return payload
 
 
 def _required_string(payload: Any, field: str) -> str:
     value = payload.get(field) if isinstance(payload, dict) else None
     if not isinstance(value, str) or not value.strip():
-        raise InvalidRequest(f"{field} zorunlu bir string alanıdır")
+        raise InvalidRequest(f"{field} is a required string field")
     return value.strip()
 
 
 def _validate_action(value: str) -> str:
     if value not in {"BUY", "SELL"}:
-        raise InvalidRequest("action BUY veya SELL olmalı", "422 Unprocessable Content")
+        raise InvalidRequest("action must be BUY or SELL", "422 Unprocessable Content")
     return value
 
 
 def _validate_size(value: Any) -> str:
     if not isinstance(value, str):
-        raise InvalidRequest("size pozitif ve sonlu bir decimal olmalı", "422 Unprocessable Content")
+        raise InvalidRequest("size must be a positive, finite decimal", "422 Unprocessable Content")
     try:
         size = Decimal(value)
     except InvalidOperation as exc:
-        raise InvalidRequest("size pozitif ve sonlu bir decimal olmalı", "422 Unprocessable Content") from exc
+        raise InvalidRequest("size must be a positive, finite decimal", "422 Unprocessable Content") from exc
     if not size.is_finite() or size <= 0:
-        raise InvalidRequest("size pozitif ve sonlu bir decimal olmalı", "422 Unprocessable Content")
+        raise InvalidRequest("size must be a positive, finite decimal", "422 Unprocessable Content")
     return value
 
 
 def create_app(*, runner: Callable[..., AnalysisJobArtifact] = run_analysis_job, now: Callable[[], str] = _utc_now):
-    """Yalnız public veri okuyan ``POST /v1/analyze`` WSGI uygulamasını üretir."""
+    """Builds the ``POST /v1/analyze`` WSGI application that reads only public data."""
 
     def app(environ: dict[str, Any], start_response: Callable):
         if environ.get("PATH_INFO") != "/v1/analyze":
             return _json_response(
                 start_response,
                 "404 Not Found",
-                {"error": {"code": "not_found", "message": "path bulunamadı"}},
+                {"error": {"code": "not_found", "message": "path not found"}},
             )
         if environ.get("REQUEST_METHOD") != "POST":
             return _json_response(
                 start_response,
                 "405 Method Not Allowed",
-                {"error": {"code": "method_not_allowed", "message": "yalnız POST desteklenir"}},
+                {"error": {"code": "method_not_allowed", "message": "only POST is supported"}},
                 [("Allow", "POST")],
             )
         try:
@@ -132,19 +132,19 @@ def create_app(*, runner: Callable[..., AnalysisJobArtifact] = run_analysis_job,
             return _json_response(
                 start_response,
                 "404 Not Found",
-                {"error": {"code": "market_or_outcome_not_found", "message": "market veya outcome bulunamadı"}},
+                {"error": {"code": "market_or_outcome_not_found", "message": "market or outcome not found"}},
             )
         except OSError:
             return _json_response(
                 start_response,
                 "502 Bad Gateway",
-                {"error": {"code": "public_source_unavailable", "message": "public market data geçici olarak erişilemez"}},
+                {"error": {"code": "public_source_unavailable", "message": "public market data is temporarily unavailable"}},
             )
         except Exception:
             return _json_response(
                 start_response,
                 "500 Internal Server Error",
-                {"error": {"code": "analysis_failed", "message": "analysis tamamlanamadı"}},
+                {"error": {"code": "analysis_failed", "message": "analysis could not be completed"}},
             )
         return _json_response(start_response, "200 OK", _serialize(artifact))
 

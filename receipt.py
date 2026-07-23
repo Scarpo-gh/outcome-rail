@@ -1,8 +1,8 @@
-"""OutcomeRail analiz çıktıları için off-chain, doğrulanabilir receipt üretimi.
+"""Off-chain, verifiable receipt generation for OutcomeRail analysis results.
 
-Bu modül finansal settlement, custody veya on-chain işlem yapmaz. Bir CLOB
-snapshot'ı, kullanılan politika ve execution-quality kararını tek bir kanonik
-payload'a bağlar. Böylece aynı analiz daha sonra bağımsız olarak doğrulanabilir.
+This module performs no financial settlement, custody, or on-chain transaction. It binds a CLOB
+snapshot, the applied policy, and an execution-quality verdict into one canonical
+payload, so the same analysis can be independently verified later.
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ SCHEMA_VERSION = "outcomerail.execution-receipt.v1"
 
 
 class ReceiptIntegrityError(ValueError):
-    """Receipt şeması veya bütünlüğü geçersiz olduğunda yükseltilir."""
+    """Raised when the receipt schema or integrity is invalid."""
 
 
 def _canonical_json(payload: dict[str, Any]) -> str:
@@ -34,7 +34,7 @@ def _sha256(payload: dict[str, Any]) -> str:
 
 
 def snapshot_content_hash(snapshot: BookSnapshot) -> str:
-    """CLOB'un kendi hash'inden bağımsız, alınan tüm seviyelerin yerel kanıt hash'i."""
+    """Local evidence hash of all fetched levels, independent of the CLOB-provided hash."""
     return _sha256(
         {
             "asks": [list(level) for level in snapshot.asks],
@@ -48,7 +48,7 @@ def snapshot_content_hash(snapshot: BookSnapshot) -> str:
 
 @dataclass(frozen=True)
 class ExecutionReceipt:
-    """Sadece analiz kanıtı taşıyan, self-verifiable immutable receipt."""
+    """Self-verifiable immutable receipt containing only analysis evidence."""
 
     payload: dict[str, Any]
     receipt_hash: str
@@ -75,23 +75,23 @@ def build_execution_receipt(
     market_id: str | None = None,
     outcome: str | None = None,
 ) -> ExecutionReceipt:
-    """Bir execution-quality raporunu kaynak snapshot ve politika ile bağlar.
+    """Binds an execution-quality report to its source snapshot and policy.
 
-    ``observed_at`` çağıranın UTC ISO-8601 zamanı olmalıdır. CLOB kaynak zamanı
-    varsa ayrıca saklanır; kaynak göndermiyorsa bunun yerine geçmez.
+    ``observed_at`` must be the caller’s UTC ISO-8601 time. The CLOB source time
+    is retained separately when available; it is not replaced when absent.
     """
     normalized_action = action.upper()
     if normalized_action not in {"BUY", "SELL"}:
-        raise ReceiptIntegrityError("action BUY veya SELL olmalı")
+        raise ReceiptIntegrityError("action must be BUY or SELL")
     if Decimal(requested_size) <= 0:
-        raise ReceiptIntegrityError("requested_size pozitif olmalı")
+        raise ReceiptIntegrityError("requested_size must be positive")
     if not observed_at or not policy_id or not policy_version:
         raise ReceiptIntegrityError("observed_at, policy_id ve policy_version zorunlu")
     if not snapshot.token_id:
         raise ReceiptIntegrityError("snapshot token_id zorunlu")
 
     if policy and (policy_id != policy.policy_id or policy_version != policy.version):
-        raise ReceiptIntegrityError("policy_id/version supplied policy ile eşleşmeli")
+        raise ReceiptIntegrityError("policy_id/version must match the supplied policy")
 
     report_timestamp = snapshot.source_timestamp or observed_at
     policy_payload = {"id": policy_id, "version": policy_version}
@@ -131,7 +131,7 @@ def build_execution_receipt(
 
 
 def verify_execution_receipt(receipt: dict[str, Any] | ExecutionReceipt) -> bool:
-    """Receipt'in şema sürümünü ve tüm payload bütünlüğünü doğrular."""
+    """Verifies the receipt schema version and integrity of the full payload."""
     serialized = receipt.to_dict() if isinstance(receipt, ExecutionReceipt) else receipt
     if not isinstance(serialized, dict):
         return False

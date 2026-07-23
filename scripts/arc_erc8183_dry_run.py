@@ -78,17 +78,17 @@ def load_state(path: Path) -> dict[str, Any]:
     try:
         state = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
-        raise ValueError("wallet state JSON okunamadı") from error
+        raise ValueError("wallet-state JSON could not be read") from error
     return validate_state(state)
 
 
 def validate_state(state: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(state, dict):
-        raise ValueError("wallet state JSON object olmalı")
+        raise ValueError("wallet-state JSON must be an object")
     for role in ("source", "destination"):
         address = state.get(role, {}).get("address")
         if not isinstance(address, str) or not _is_evm_address(address):
-            raise ValueError(f"wallet state içinde geçerli {role}.address yok")
+            raise ValueError(f"wallet state has no valid {role}.address")
     return state
 
 
@@ -114,7 +114,7 @@ def _call(actor: str, contract: str, function: str, arguments: list[Any]) -> dic
 def build_erc8183_preflight(*, receipt_json: str, state: dict[str, Any], deadline: int) -> dict[str, Any]:
     """Build Job A completion and separate Job B refund plans without execution."""
     if deadline <= int(time.time()):
-        raise ValueError("deadline gelecekte olmalı")
+        raise ValueError("deadline must be in the future")
     state = validate_state(state)
     receipt = load_verified_receipt_json(receipt_json)
     receipt_hash = derive_receipt_bytes32(receipt)
@@ -204,7 +204,7 @@ def main() -> None:
     parser.add_argument("--env-file", type=Path, help="Optional local Circle .env; read only after both execution guards pass")
     args = parser.parse_args()
     if args.deadline_minutes < 10:
-        raise SystemExit("Deadline en az 10 dakika olmalı; refund testi için güvenli buffer gerekir.")
+        raise SystemExit("Deadline must be at least 10 minutes ahead; the refund test needs a safe buffer.")
 
     deadline = int(time.time()) + args.deadline_minutes * 60
     plan = build_erc8183_preflight(

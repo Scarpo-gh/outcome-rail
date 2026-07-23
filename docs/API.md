@@ -1,27 +1,27 @@
 # OutcomeRail Read-only Analysis API — V1
 
-`POST /v1/analyze`, ilk public-data adapter olarak bir Polymarket market/outcome snapshot'ını yalnız public Gamma ve CLOB verisiyle execution feasibility açısından değerlendirir. Bu endpoint trade, wallet, custody, transfer, wagering, yatırım tavsiyesi, credential veya Arc on-chain işlemi başlatmaz.
+`POST /v1/analyze` assesses a Polymarket market/outcome snapshot for execution feasibility using only public Gamma and CLOB data, with Polymarket as the first public-data adapter. This endpoint does not initiate trading, wallet, custody, transfer, wagering, investment-advice, credential, or Arc on-chain operations.
 
-> Bu WSGI servis GitHub Pages üzerinde çalışmaz. Pages yalnız static demo/dokümantasyonu sunar; API local loopback için tasarlanmıştır.
+> This WSGI service does not run on GitHub Pages. Pages serves only the static demo and documentation; the API is designed for local loopback use.
 
-## Çalıştırma
+## Run
 
 ```bash
 cd /path/to/outcome-rail
 python3 scripts/serve_api.py
 ```
 
-Varsayılan adres: `http://127.0.0.1:8080`.
+Default address: `http://127.0.0.1:8080`.
 
-Farklı bir local port seçmek için:
+To choose a different local port:
 
 ```bash
 python3 scripts/serve_api.py --port 8090
 ```
 
-Varsayılanı bilinçli olarak loopback'tir. Bu minimal V1; auth/rate-limit/reverse-proxy olmadan public internete bind edilmemelidir.
+The loopback default is intentional. This minimal V1 must not be bound to the public internet without authentication, rate limiting, and a reverse proxy.
 
-## İstek
+## Request
 
 ```bash
 curl --fail --silent --show-error \
@@ -35,16 +35,16 @@ curl --fail --silent --show-error \
   }'
 ```
 
-| Alan | Tür | Kural |
+| Field | Type | Rule |
 |---|---|---|
-| `market_id` | string | Boş olmayan public Gamma market kimliği. |
-| `outcome` | string | Boş olmayan outcome adı. |
-| `action` | string | Tam olarak `BUY` veya `SELL`. |
-| `size` | string | Pozitif, sonlu decimal. Örn. `"10"`. |
+| `market_id` | string | Non-empty public Gamma market identifier. |
+| `outcome` | string | Non-empty outcome label. |
+| `action` | string | Exactly `BUY` or `SELL`. |
+| `size` | string | Positive, finite decimal; for example `"10"`. |
 
-Body en fazla 8192 byte olabilir.
+The body may be at most 8,192 bytes.
 
-## Başarılı yanıt — `200 OK`
+## Successful response — `200 OK`
 
 ```json
 {
@@ -61,30 +61,30 @@ Body en fazla 8192 byte olabilir.
 }
 ```
 
-`manifest.content_hash` ile `receipt.input.manifest_hash` eşleşir. API başarı yanıtı local evidence entry veya evidence-log path döndürmez ve yazmaz.
+`manifest.content_hash` matches `receipt.input.manifest_hash`. A successful API response neither returns nor writes a local evidence entry or evidence-log path.
 
-## Hatalar
+## Errors
 
-| HTTP | `error.code` | Durum |
+| HTTP | `error.code` | Condition |
 |---|---|---|
-| `400` | `invalid_request` | Bozuk JSON, eksik alan veya geçersiz `Content-Length`. |
-| `404` | `not_found` | `/v1/analyze` dışında path. |
-| `404` | `market_or_outcome_not_found` | Public market/outcome çözülemedi. |
-| `405` | `method_not_allowed` | POST dışında method; `Allow: POST` döner. |
-| `413` | `payload_too_large` | Body 8192 byte sınırını geçti. |
-| `422` | `invalid_request` | Geçersiz `action` veya `size`. |
-| `502` | `public_source_unavailable` | Public market verisi geçici olarak erişilemez. |
-| `500` | `analysis_failed` | Sanitise edilmiş beklenmeyen analiz hatası. |
+| `400` | `invalid_request` | Malformed JSON, a missing field, or invalid `Content-Length`. |
+| `404` | `not_found` | A path other than `/v1/analyze`. |
+| `404` | `market_or_outcome_not_found` | The public market/outcome could not be resolved. |
+| `405` | `method_not_allowed` | A method other than POST; returns `Allow: POST`. |
+| `413` | `payload_too_large` | Body exceeds the 8,192-byte limit. |
+| `422` | `invalid_request` | Invalid `action` or `size`. |
+| `502` | `public_source_unavailable` | Public market data is temporarily unavailable. |
+| `500` | `analysis_failed` | Sanitized unexpected analysis failure. |
 
-Hata formatı deterministiktir:
+The error format is deterministic:
 
 ```json
 {"error":{"code":"invalid_request","message":"..."}}
 ```
 
-## Sınırlar
+## Boundaries
 
-- V1 yalnız public Polymarket Gamma/CLOB GET çağrılarını kullanır.
-- Snapshot tabanlıdır; receipt anlık emir uygulanabilirliği veya kârlılık garantisi değildir.
-- API, `scripts/demo_receipt.py` aksine varsayılan olarak append-only evidence log üretmez.
-- Local development için dependency-free stdlib WSGI kullanır.
+- V1 only uses public Polymarket Gamma/CLOB GET calls.
+- It is snapshot-based; a receipt is not a guarantee of immediate order executability or profitability.
+- Unlike `scripts/demo_receipt.py`, the API does not write an append-only evidence log by default.
+- It uses the dependency-free standard-library WSGI stack for local development.

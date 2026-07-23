@@ -1,4 +1,4 @@
-"""Local, append-only ve hash-zincirli OutcomeRail kanıt günlüğü."""
+"""Local append-only, hash-chained OutcomeRail evidence log."""
 from __future__ import annotations
 
 import hashlib

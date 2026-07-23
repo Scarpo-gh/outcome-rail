@@ -8,17 +8,12 @@
 - No API key, entity secret, wallet, faucet request, private key or live transaction was created for this preflight.
 - Arc Testnet RPC previously responds with chain ID `5042002`.
 
-## Contract demo transaction plan
+## Historical custom-contract plan — superseded
 
-The intended testnet proof requires separate, bounded jobs:
-
-1. Deploy `AnalysisJobEscrow`.
-2. Job A: requester `createJob(provider, requestHash, deadline)` with a small test-only amount.
-3. Job A: provider `settleJob(jobId, receiptHash)`.
-4. Job B: requester creates and funds a second job.
-5. Job B: after deadline, requester calls `refundExpiredJob(jobId)`.
-
-This produces separate deploy, settlement, and refund evidence. It does not trade, custody user funds, connect a user wallet, or use mainnet value.
+The initial custom `AnalysisJobEscrow` plan is retained only as a local fallback
+state-machine reference. It was **not deployed** and must not be read as live
+Arc evidence. The builder-demo default is now the official predeployed ERC-8183
+reference contract described below.
 
 ## SDK dry-run result
 
@@ -50,6 +45,29 @@ The official lifecycle is:
 6. evaluator: `complete(jobId, reasonHash, optParams)`
 
 The reference flow proves a completed, receipt-backed escrow job. The ERC-8183 specification also defines the timeout/refund path: after `expiredAt`, any caller may use `claimRefund(jobId)` while the job is Funded or Submitted; the contract marks it Expired and returns escrow to the client. The reference-contract ABI/function selector must be verified in the dry-run before broadcast.
+
+## Receipt-bound call-plan module
+
+`scripts/arc_erc8183_dry_run.py` accepts a public wallet-state JSON and a
+canonical OutcomeRail execution-receipt JSON. It rejects malformed, duplicate
+key, tampered, or unverifiable receipts before converting the receipt hash to
+the `bytes32` passed to Job A's `submit` call.
+
+```bash
+python scripts/arc_erc8183_dry_run.py --state public-wallet-state.json --receipt receipt.json
+```
+
+The output is only a deterministic JSON call plan for two separate jobs:
+
+- **Job A:** `createJob`, `setBudget`, USDC `approve`, `fund`, `submit`, and
+  `complete`, with the verified receipt hash bound as `deliverableHash`.
+- **Job B:** a separate `createJob`, `setBudget`, USDC `approve`, `fund`, and
+  post-expiry `claimRefund` path.
+
+This module imports no Circle SDK and performs no network/API/RPC call or
+transaction broadcast. Its mode is always `DRY_RUN_NO_BROADCAST`. `--execute`
+is intentionally unavailable; it requires the literal confirmation token
+`ERC8183_EXECUTION_CONFIRMED` and still fails closed without broadcasting.
 
 ## Superseded custom deploy gate
 

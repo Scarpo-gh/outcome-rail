@@ -102,11 +102,23 @@ Receipt aşağıdakileri tek hash kapsamına alır:
 
 ## Arc ile bağlantı
 
-Mevcut ürün katmanı off-chain/read-only'dir. Arc için şu anki kanıt, ayrı olarak doğrulanmış Circle Developer-Controlled Wallet testnet transferidir:
+Ürün katmanı off-chain/read-only kalır. Arc Testnet üzerinde ise OutcomeRail için
+iki **test-USDC** ERC-8183 kanıtı üretildi. Bunlar trade, wager veya kullanıcı
+fonu değildir; ayrı test walletlar arasında bounded analysis-job demonstrasyonudur.
 
-- [Arc Testnet transaction](https://testnet.arcscan.app/tx/0x5bfe13e4be52ae771bc814edd58b5c63f07501a53e197b80127aa65ccbef8615)
+### Job A — receipt teslimi ve complete
 
-Bu transfer **OutcomeRail receipt settlement'i değildir**. Bir sonraki Arc-native adım, ancak gerçek feedback/agent talebi varsa bounded bir analysis job için test-USDC escrow ve receipt doğrulamasına göre release/refund tasarlamaktır.
+- Job ID: `159281`
+- Verified OutcomeRail receipt hash: `0x2257db655f069e89c00ff637e36c46612911d5eb3f80fa4d96c68a381c76a02b`
+- [createJob](https://testnet.arcscan.app/tx/0x7c5fb3eb26fb6df90eb26af43a8a898dc30d6eb54703ea763849ca0b8f16a635) → [setBudget](https://testnet.arcscan.app/tx/0x8124665d7d6433baa3de320ac9be10f7e3b488ffc4b3ae898d3c5b54896d4d77) → [approve](https://testnet.arcscan.app/tx/0x00d55da8eadb78aa43dc7a36bedb58540c2c60d2cef5709b7f74e1a9e1252615) → [fund](https://testnet.arcscan.app/tx/0x71cb7cfd7521286ee742468c57255dd80a8d76a6de3fef791eac63582bdea589) → [submit](https://testnet.arcscan.app/tx/0x40659649ee965ce59de1fe0f985d6fff89d1de8958521ca6460e0dc9309f832e) → [complete](https://testnet.arcscan.app/tx/0x5968dfe24910eb734fcaaa96cfa7afc9152fbb3611b271f211f1d801312a5ea7)
+
+### Job B — expiry ve refund
+
+- Job ID: `159283`
+- [createJob](https://testnet.arcscan.app/tx/0x5778d7a58a5246c0f273a85c208d695577312ed10b8fd561f0c2c0106b6a0f04) → [setBudget](https://testnet.arcscan.app/tx/0x45275f5878ddefd78d0cb5c8c65927e6c98f7948d334494e5a451cbd781b46c7) → [approve](https://testnet.arcscan.app/tx/0x49a012b36f86add4e3c45b70240a5909765434cb7825b690679f0af4b039291c) → [fund](https://testnet.arcscan.app/tx/0x88ba57c48791d2d689ef5e65e3768215a0c8229e226c294d7969aa0cd25d710e) → [claimRefund](https://testnet.arcscan.app/tx/0x94865921d18d15f0c9c3391c0cd7eaa17b887651fc74b0af4bf6ec0e5f565f4e)
+
+Bu kanıtlar yalnız testnet demonstrasyonudur: mainnet, gerçek USDC, custody,
+wallet-connect veya otomatik trade içermez.
 
 ## Builder feedback isteği
 

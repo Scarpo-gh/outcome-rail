@@ -86,4 +86,4 @@ Varsayılan adres yalnız loopback'tir: `http://127.0.0.1:8080`.
 - Polymarket trading credential’ı istenmez veya saklanmaz.
 - Otomatik trade yapılmaz.
 - Circle API key, Entity Secret veya recovery file bu projeye konmaz.
-- Arc entegrasyonu daha sonra report hash / job receipt kanıtı için eklenir; V1 motoru zincirden bağımsızdır.
+- Arc entegrasyonu, doğrulanmış receipt hash'ini bounded **testnet** analysis-job yaşam döngüsüne bağlar. Gerçek kanıtlar ve Arcscan linkleri: [`docs/BUILDER_DEMO.md`](docs/BUILDER_DEMO.md#arc-ile-bağlantı). Mainnet, gerçek USDC ve kullanıcı fonu kapsam dışıdır.

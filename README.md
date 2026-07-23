@@ -61,7 +61,7 @@ Arc builder görünürlüğü için kısa ürün hikâyesi, canlı demo komutu, 
 
 Public demo: [scarpo-gh.github.io/outcome-rail](https://scarpo-gh.github.io/outcome-rail/)
 
-Arc Testnet evidence: [`docs/ARC_EVIDENCE.md`](docs/ARC_EVIDENCE.md). Builder demo script: [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md). Checkpoint presentation: [`docs/checkpoint-2-deck.html`](docs/checkpoint-2-deck.html). Clean-clone verification: [`docs/CLEAN_REPRODUCTION_REPORT.md`](docs/CLEAN_REPRODUCTION_REPORT.md).
+Arc Testnet evidence: [`docs/ARC_EVIDENCE.md`](docs/ARC_EVIDENCE.md). Builder demo script: [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md). Checkpoint presentation: [`docs/checkpoint-2-deck.html`](docs/checkpoint-2-deck.html). Mid-submission video: [`docs/assets/outcomerail-mid-submission-update.mp4`](docs/assets/outcomerail-mid-submission-update.mp4). Mid-submission summary: [`docs/MID_SUBMISSION_SUMMARY.md`](docs/MID_SUBMISSION_SUMMARY.md). Clean-clone verification: [`docs/CLEAN_REPRODUCTION_REPORT.md`](docs/CLEAN_REPRODUCTION_REPORT.md).
 
 ## Çalıştırma
 

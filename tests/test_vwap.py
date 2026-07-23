@@ -58,6 +58,24 @@ def test_analyze_execution_returns_expected_price_and_top_of_book_spread():
     assert report.spread == Decimal("0.01")
 
 
+def test_analyze_execution_uses_price_priority_when_book_levels_are_unordered():
+    buy = analyze_execution(
+        action="BUY",
+        bids=[("0.49", "100")],
+        asks=[("0.60", "10"), ("0.50", "10")],
+        requested_size="10",
+    )
+    sell = analyze_execution(
+        action="SELL",
+        bids=[("0.40", "10"), ("0.50", "10")],
+        asks=[("0.51", "100")],
+        requested_size="10",
+    )
+
+    assert buy.expected_price == Decimal("0.50")
+    assert sell.expected_price == Decimal("0.50")
+
+
 def test_canonical_report_hash_is_stable_for_same_report_and_snapshot():
     report = analyze_execution(
         action="SELL",

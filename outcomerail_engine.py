@@ -44,8 +44,8 @@ def analyze_execution(
     if normalized_action not in {"BUY", "SELL"}:
         raise ValueError("action BUY veya SELL olmalı")
 
-    bid_levels = tuple(bids)
-    ask_levels = tuple(asks)
+    bid_levels = tuple(sorted(bids, key=lambda level: Decimal(level[0]), reverse=True))
+    ask_levels = tuple(sorted(asks, key=lambda level: Decimal(level[0])))
     estimate = estimate_vwap(
         ask_levels if normalized_action == "BUY" else bid_levels, requested_size
     )

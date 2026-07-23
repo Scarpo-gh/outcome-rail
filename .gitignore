@@ -21,6 +21,8 @@ cache/
 
 # Runtime evidence and local credentials are never published or committed.
 evidence/
+!docs/evidence/
+!docs/evidence/**
 secrets/
 *.pem
 *.key

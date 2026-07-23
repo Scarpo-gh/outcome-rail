@@ -7,12 +7,17 @@
 
 ```bash
 git clone --depth 1 https://github.com/Scarpo-gh/outcome-rail.git /tmp/outcomerail-clean
+cd /tmp/outcomerail-clean
 python3 -m venv .venv
-.venv/bin/pip install --upgrade pip pytest
+.venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python -m py_compile *.py scripts/*.py
 .venv/bin/pytest -q
-/home/hermes/.foundry/bin/forge test -q
+forge test -q
 ```
+
+`requirements-dev.txt` pins the Python test dependency. Foundry `v1.7.1` is
+pinned in CI; install that version (or a compatible Foundry distribution) so
+that `forge` is available on `PATH`.
 
 ## Results
 

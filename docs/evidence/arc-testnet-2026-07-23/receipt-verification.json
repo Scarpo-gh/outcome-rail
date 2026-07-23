@@ -1,0 +1,6 @@
+{
+  "receipt_schema": "outcomerail.execution-receipt.v1",
+  "receipt_hash": "2257db655f069e89c00ff637e36c46612911d5eb3f80fa4d96c68a381c76a02b",
+  "verified": true,
+  "verification_command": "python3 -c 'import json; from receipt import verify_execution_receipt; print(verify_execution_receipt(json.load(open(\"docs/evidence/arc-testnet-2026-07-23/receipt.json\"))))'"
+}

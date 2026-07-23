@@ -4,6 +4,8 @@
 **Reference contract:** `0x0747EEf0706327138c69792bF28Cd525089e4583`  
 **Scope:** Bounded, two-wallet, test-USDC ERC-8183 demonstration. This is not trading, wagering, mainnet settlement, custody, or a user-wallet flow.
 
+**Tracked evidence bundle:** [`evidence/arc-testnet-2026-07-23/`](evidence/arc-testnet-2026-07-23/) contains the canonical receipt, its verification output, and the receipt-to-job/transaction mapping.
+
 ## Receipt binding
 
 OutcomeRail generated and verified a canonical public-data execution receipt before it was passed as the Job A deliverable commitment:

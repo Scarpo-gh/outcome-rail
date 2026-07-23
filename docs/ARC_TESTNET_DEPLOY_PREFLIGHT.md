@@ -64,10 +64,20 @@ The output is only a deterministic JSON call plan for two separate jobs:
 - **Job B:** a separate `createJob`, `setBudget`, USDC `approve`, `fund`, and
   post-expiry `claimRefund` path.
 
-This module imports no Circle SDK and performs no network/API/RPC call or
-transaction broadcast. Its mode is always `DRY_RUN_NO_BROADCAST`. `--execute`
-is intentionally unavailable; it requires the literal confirmation token
-`ERC8183_EXECUTION_CONFIRMED` and still fails closed without broadcasting.
+By default this module performs no Circle SDK import, network/API/RPC call, or
+transaction broadcast; its preflight output is `DRY_RUN_NO_BROADCAST`. A real
+broadcast is possible only for **one named lifecycle step** when all of the
+following are supplied:
+
+```text
+--execute
+--confirm ERC8183_EXECUTION_CONFIRMED
+--step <named lifecycle step>
+```
+
+That guarded path may read a local Circle environment file and submit exactly
+one contract-execution request. It is not a default demo path and should be
+used only with explicit testnet authorization.
 
 ## Superseded custom deploy gate
 

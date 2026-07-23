@@ -47,7 +47,7 @@ python3 scripts/demo_receipt.py --market-id <gamma-market-id> --outcome Yes --ac
 python3 scripts/demo_receipt.py --token-id <public-clob-token-id> --action BUY --size 10
 ```
 
-Market yolu Gamma'dan outcome token'ını çözer ve receipt'e canonical input manifest hash'ini de bağlar. Manifest ayrıca kullanılan public Gamma market ve CLOB book endpoint URL'lerini hash kapsamına alır; CLOB'un kaynak timestamp/hash'i receipt snapshot'ında korunur. Market komutu varsayılan olarak `evidence/outcomerail.jsonl` içine append-only, hash-zincirli **yerel** evidence entry yazar; bu dosya git'e dahil edilmez. Bütünlüğü bağımsız doğrulamak için:
+Market yolu Gamma'dan outcome token'ını çözer ve receipt'e canonical input manifest hash'ini de bağlar. Manifest ayrıca kullanılan public Gamma market ve CLOB book endpoint URL'lerini hash kapsamına alır; CLOB'un kaynak timestamp/hash'i receipt snapshot'ında korunur. Market komutu varsayılan olarak `evidence/outcomerail.jsonl` içine yerel, hash-zincirli bir evidence entry yazar; bu dosya git'e dahil edilmez. Bu log yerel filesystem yazma erişimine karşı tek başına immutable değildir. Bütünlüğü aynı dosya içinde doğrulamak için:
 
 ```bash
 python3 scripts/verify_evidence.py --log evidence/outcomerail.jsonl

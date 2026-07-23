@@ -49,10 +49,10 @@ def _parse_payload(environ: dict[str, Any]) -> dict[str, Any]:
     except ValueError as exc:
         raise InvalidRequest("body must be a valid JSON object") from exc
     if content_length < 0:
-        raise InvalidRequest("Content-Length negatif olamaz")
+        raise InvalidRequest("Content-Length cannot be negative")
     if content_length > MAX_BODY_BYTES:
         raise InvalidRequest(
-            f"body en fazla {MAX_BODY_BYTES} byte olabilir",
+            f"body may be at most {MAX_BODY_BYTES} bytes",
             "413 Payload Too Large",
             "payload_too_large",
         )

@@ -85,7 +85,7 @@ def main() -> None:
     observed_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     if args.market_id:
         if not args.outcome:
-            parser.error("--market-id ile --outcome zorunlu")
+            parser.error("--outcome is required with --market-id")
         artifact = build_market_demo_receipt(market_id=args.market_id, outcome=args.outcome,
             action=args.action, size=args.size, observed_at=observed_at, evidence_log_path=args.evidence_log)
     else:

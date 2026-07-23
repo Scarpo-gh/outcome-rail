@@ -26,7 +26,7 @@ class ExecutionPolicy:
 
     def __post_init__(self) -> None:
         if not self.policy_id or not self.version:
-            raise ValueError("policy_id ve version zorunlu")
+            raise ValueError("policy_id and version are required")
         if self.max_snapshot_age_seconds <= 0:
             raise ValueError("max_snapshot_age_seconds must be positive")
         if self.max_spread <= 0 or self.max_price_gap <= 0:
@@ -54,7 +54,7 @@ class PolicyEvaluation:
 
 def _parse_timestamp(raw_timestamp: str) -> datetime:
     if not raw_timestamp:
-        raise ValueError("snapshot source_timestamp zorunlu")
+        raise ValueError("snapshot source_timestamp is required")
     try:
         epoch = Decimal(raw_timestamp)
     except Exception:

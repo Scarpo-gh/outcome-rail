@@ -1,4 +1,4 @@
-"""OutcomeRail read-only analysis request provenance manifest'i."""
+"""OutcomeRail provenance manifest for a read-only analysis request."""
 from __future__ import annotations
 
 import hashlib
@@ -48,5 +48,5 @@ def build_input_manifest(**kwargs: str) -> AnalysisInputManifest:
         raise ValueError("action must be BUY/SELL and requested_size must be positive")
     for name in ("market_id", "outcome", "token_id", "observed_at", "snapshot_content_hash", "policy_content_hash"):
         if not kwargs[name]:
-            raise ValueError(f"{name} zorunlu")
+            raise ValueError(f"{name} is required")
     return AnalysisInputManifest(action=action, **{key: str(value) for key, value in kwargs.items() if key != "action"})

@@ -86,9 +86,9 @@ def build_execution_receipt(
     if Decimal(requested_size) <= 0:
         raise ReceiptIntegrityError("requested_size must be positive")
     if not observed_at or not policy_id or not policy_version:
-        raise ReceiptIntegrityError("observed_at, policy_id ve policy_version zorunlu")
+        raise ReceiptIntegrityError("observed_at, policy_id, and policy_version are required")
     if not snapshot.token_id:
-        raise ReceiptIntegrityError("snapshot token_id zorunlu")
+        raise ReceiptIntegrityError("snapshot token_id is required")
 
     if policy and (policy_id != policy.policy_id or policy_version != policy.version):
         raise ReceiptIntegrityError("policy_id/version must match the supplied policy")

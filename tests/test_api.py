@@ -145,7 +145,7 @@ def test_analyze_endpoint_rejects_body_larger_than_8_kib_before_parsing():
     status, _, body = _request(app, payload=b"x" * 8193)
 
     assert status == "413 Payload Too Large"
-    assert body == {"error": {"code": "payload_too_large", "message": "body en fazla 8192 byte olabilir"}}
+    assert body == {"error": {"code": "payload_too_large", "message": "body may be at most 8192 bytes"}}
 
 
 def test_api_returns_404_for_other_paths_before_parsing():
@@ -215,7 +215,7 @@ def test_analyze_endpoint_rejects_negative_content_length_before_reading_body():
     )
 
     assert status == "400 Bad Request"
-    assert body == {"error": {"code": "invalid_request", "message": "Content-Length negatif olamaz"}}
+    assert body == {"error": {"code": "invalid_request", "message": "Content-Length cannot be negative"}}
 
 
 def test_analyze_endpoint_hides_unexpected_runner_error():

@@ -61,6 +61,8 @@ Arc builder görünürlüğü için kısa ürün hikâyesi, canlı demo komutu, 
 
 Public demo: [scarpo-gh.github.io/outcome-rail](https://scarpo-gh.github.io/outcome-rail/)
 
+Arc Testnet evidence: [`docs/ARC_EVIDENCE.md`](docs/ARC_EVIDENCE.md). Builder demo script: [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md).
+
 ## Çalıştırma
 
 ```bash

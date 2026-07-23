@@ -30,7 +30,32 @@ The installed Circle Developer-Controlled Wallet Python SDK exposes:
 
 Its inspected contract-execution request requires `contractAddress` plus a function signature/call data. The installed SDK does **not** expose a distinct contract-deployment transaction method. Therefore no contract deployment request will be fabricated or broadcast from this route.
 
-## Deployment gate
+## Official ERC-8183 route found after the initial SDK preflight
+
+Arc’s current official **Create your first ERC-8183 job** tutorial provides a deployed Arc Testnet reference implementation:
+
+```text
+AgenticCommerce: 0x0747EEf0706327138c69792bF28Cd525089e4583
+```
+
+This removes the need to deploy the custom fallback contract for the builder demonstration. The installed Circle Wallet SDK's contract-execution route is sufficient because it calls an **existing** reference contract.
+
+The official lifecycle is:
+
+1. `createJob(provider, evaluator, expiredAt, description, hook)`
+2. provider: `setBudget(jobId, amount, optParams)`
+3. client: ERC-20 `approve(referenceContract, amount)`
+4. client: `fund(jobId, optParams)`
+5. provider: `submit(jobId, deliverableHash, optParams)`
+6. evaluator: `complete(jobId, reasonHash, optParams)`
+
+The reference flow proves a completed, receipt-backed escrow job. A timeout/refund path must be verified from the reference contract's documented lifecycle before it is claimed; do not map the custom fallback contract's refund function onto the reference contract without that verification.
+
+## Superseded custom deploy gate
+
+The custom `AnalysisJobEscrow` remains a locally tested fallback/state-machine reference. It is no longer the default testnet path. The next testnet gate is a **dry-run of the official predeployed ERC-8183 reference flow**, using the existing Circle wallets and no new keys or wallets.
+
+## Previous custom-contract deployment gate (superseded)
 
 Before an Arc deployment, confirm the official Circle-supported deployment route for the current account (for example Smart Contract Platform or a documented Developer-Controlled Wallet deploy flow), including:
 
